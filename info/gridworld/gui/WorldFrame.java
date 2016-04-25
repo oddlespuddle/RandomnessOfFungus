@@ -411,7 +411,7 @@ public class WorldFrame<T> extends JFrame
                         //~ control.deleteLocation();
                     //~ }
                 //~ }));
-        menuItemsDisabledDuringRun.add(viewDeleteMenu);
+        //~ menuItemsDisabledDuringRun.add(viewDeleteMenu);
 
         menu.add(makeMenuItem("menu.view.zoomin", new ActionListener()
         {
