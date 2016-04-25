@@ -41,13 +41,13 @@ public class Floor extends World<Actor>
 		setGrid(new BoundedGrid<Actor>(SIDE_LENGTH, SIDE_LENGTH));
 		generateMaze();
 		
-		staircase = new Flower();
+		staircase = new Staircase();
 		staircase.putSelfInGrid(getGrid(), getRandomEmptyLocation());
 		
 		Location playerLoc = getRandomEmptyLocation();
 		mask();
 		
-		player = new RNGesus(this);
+		player = new Player();
 		player.putSelfInGrid(getGrid(), playerLoc);
 		unmask(player.getLocation());
 	}

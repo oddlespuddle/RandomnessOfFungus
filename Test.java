@@ -8,4 +8,5 @@ import info.gridworld.grid.Location;
 import info.gridworld.actor.ActorWorld;
 
 public class Test{
+	
 }

@@ -196,6 +196,8 @@ public class GUIController<T>
      */
     private void makeControls()
     {
+		return;
+		/*
         controlPanel = new JPanel();
         stepButton = new JButton(resources.getString("button.gui.step"));
         runButton = new JButton(resources.getString("button.gui.run"));
@@ -268,6 +270,7 @@ public class GUIController<T>
                 timer.setDelay(((JSlider) evt.getSource()).getValue());
             }
         });
+        //*/
     }
 
     /**

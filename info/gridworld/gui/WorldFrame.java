@@ -74,7 +74,7 @@ import java.io.StringWriter;
  */
 public class WorldFrame<T> extends JFrame
 {
-    private GUIController<T> control;
+    //~ private GUIController<T> control;
     private GridPanel display;
     private JTextArea messageArea;
     private ArrayList<JMenuItem> menuItemsDisabledDuringRun;
@@ -184,8 +184,8 @@ public class WorldFrame<T> extends JFrame
 
         makeNewGridMenu();
 
-        control = new GUIController<T>(this, display, displayMap, resources);
-        content.add(control.controlPanel(), BorderLayout.SOUTH);
+        //~ control = new GUIController<T>(this, display, displayMap, resources);
+        //~ content.add(control.controlPanel(), BorderLayout.SOUTH);
 
         messageArea = new JTextArea(2, 35);
         messageArea.setEditable(false);
@@ -391,26 +391,26 @@ public class WorldFrame<T> extends JFrame
             }
         }));
 
-        JMenuItem viewEditMenu;
-        menu.add(viewEditMenu = makeMenuItem("menu.view.edit",
-                new ActionListener()
-                {
-                    public void actionPerformed(ActionEvent e)
-                    {
-                        control.editLocation();
-                    }
-                }));
-        menuItemsDisabledDuringRun.add(viewEditMenu);
+        //~ JMenuItem viewEditMenu;
+        //~ menu.add(viewEditMenu = makeMenuItem("menu.view.edit",
+                //~ new ActionListener()
+                //~ {
+                    //~ public void actionPerformed(ActionEvent e)
+                    //~ {
+                        //~ control.editLocation();
+                    //~ }
+                //~ }));
+        //~ menuItemsDisabledDuringRun.add(viewEditMenu);
 
-        JMenuItem viewDeleteMenu;
-        menu.add(viewDeleteMenu = makeMenuItem("menu.view.delete",
-                new ActionListener()
-                {
-                    public void actionPerformed(ActionEvent e)
-                    {
-                        control.deleteLocation();
-                    }
-                }));
+        //~ JMenuItem viewDeleteMenu;
+        //~ menu.add(viewDeleteMenu = makeMenuItem("menu.view.delete",
+                //~ new ActionListener()
+                //~ {
+                    //~ public void actionPerformed(ActionEvent e)
+                    //~ {
+                        //~ control.deleteLocation();
+                    //~ }
+                //~ }));
         menuItemsDisabledDuringRun.add(viewDeleteMenu);
 
         menu.add(makeMenuItem("menu.view.zoomin", new ActionListener()
