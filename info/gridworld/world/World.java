@@ -40,7 +40,7 @@ public class World<T>
     private Set<String> occupantClassNames;
     private Set<String> gridClassNames;
     private String message;
-    private JFrame frame;
+    private WorldFrame<T> frame;
 
     private static Random generator = new Random();
 
@@ -74,7 +74,7 @@ public class World<T>
         }
         else
         {
-			((WorldFrame<T>) frame).setGrid(getGrid());
+			frame.setGrid(getGrid());
             frame.repaint();
 		}
     }

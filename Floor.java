@@ -47,7 +47,7 @@ public class Floor extends World<Actor>
 		Location playerLoc = getRandomEmptyLocation();
 		mask();
 		
-		player = new Player();
+		player = new RNGesus(this);
 		player.putSelfInGrid(getGrid(), playerLoc);
 		unmask(player.getLocation());
 	}
