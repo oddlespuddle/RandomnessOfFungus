@@ -7,39 +7,67 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.GraphicsEnvironment;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JTextArea;
 import javax.swing.Timer;
 
 public class Test{
 	public static void main(String args[]) throws Exception {
 		//Frame Setup
-		final JFrame frame = new JFrame();
+		JFrame frame = new JFrame();
 		frame.setSize(500, 500);
-		frame.setLocation(0, 0);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setBackground(Color.BLACK);
+		frame.getContentPane().setBackground(Color.CYAN);
 		
-		//Picture Setup
+		//Panel Setup
+		JPanel panel = new JPanel(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		
+		//Battle Declaration
+		JTextArea messageArea = new JTextArea(3, 20);
+		messageArea.setEditable(false);
+		messageArea.setFocusable(false);
+		messageArea.setBackground(new Color(0xFAFAD2));
+		messageArea.setText("\nYOU ARE EXPERIENCING AN APPARITION OF RNGESUS");
+		c.gridx = 0;
+		c.gridy = 0;
+		c.gridwidth = 3;
+		c.gridheight = 1;
+		c.fill = GridBagConstraints.BOTH;
+		panel.add(messageArea, c);
+		
+		//RNGesus
 		JLabel rnGesus = pictureLabel("EnemySprites/RNGesusSprite.png");
-		JPanel panel = new JPanel();
-		panel.add(rnGesus);
-		panel.setBackground(Color.WHITE);
-		//~ rnGesus.setSize(525, 207);
-		//~ rnGesus.setLocation(20, 20);
-		frame.add(panel);
-		//~ (new Timer(50, new ActionListener() {
-				//~ public void actionPerformed(ActionEvent e){
-					//~ if(pen.getX() + pen.getWidth() > frame.getWidth()- boy.getWidth())
-						//~ pen.setLocation(girl.getWidth(), 85);
-					//~ else
-						//~ pen.setLocation(pen.getX() + frame.getWidth()/80, 85);
-				//~ }
-		//~ })).start();
+		c.gridx = 0;
+		c.gridy = 2;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		panel.add(rnGesus, c);
 		
+		panel.add(rnGesus);
+
+		//Options
+		c.gridy = 3;
+		c.gridwidth = 1;
+		c.fill = GridBagConstraints.BOTH;
+		for(int gridx = 0; gridx < 4; gridx++)
+		{
+			c.gridx = gridx;
+			JTextArea playerOption = new JTextArea(3, 20);
+			playerOption.setEditable(false);
+			playerOption.setFocusable(false);
+			playerOption.setBackground(new Color(0xFAFAD2));
+			playerOption.setText("Option No. " + gridx + "\nSquirrel");
+			panel.add(playerOption, c);
+		}
+		
+		frame.add(panel);
 		frame.setVisible(true);
 	}
 	
