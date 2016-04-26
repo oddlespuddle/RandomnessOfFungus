@@ -341,6 +341,7 @@ public class WorldFrame<T> extends JFrame
 
     private void makeMenus()
     {
+		/*
         JMenuBar mbar = new JMenuBar();
         JMenu menu;
 
@@ -391,27 +392,27 @@ public class WorldFrame<T> extends JFrame
             }
         }));
 
-        //~ JMenuItem viewEditMenu;
-        //~ menu.add(viewEditMenu = makeMenuItem("menu.view.edit",
-                //~ new ActionListener()
-                //~ {
-                    //~ public void actionPerformed(ActionEvent e)
-                    //~ {
-                        //~ control.editLocation();
-                    //~ }
-                //~ }));
-        //~ menuItemsDisabledDuringRun.add(viewEditMenu);
+        JMenuItem viewEditMenu;
+        menu.add(viewEditMenu = makeMenuItem("menu.view.edit",
+                new ActionListener()
+                {
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        control.editLocation();
+                    }
+                }));
+        menuItemsDisabledDuringRun.add(viewEditMenu);
 
-        //~ JMenuItem viewDeleteMenu;
-        //~ menu.add(viewDeleteMenu = makeMenuItem("menu.view.delete",
-                //~ new ActionListener()
-                //~ {
-                    //~ public void actionPerformed(ActionEvent e)
-                    //~ {
-                        //~ control.deleteLocation();
-                    //~ }
-                //~ }));
-        //~ menuItemsDisabledDuringRun.add(viewDeleteMenu);
+        JMenuItem viewDeleteMenu;
+        menu.add(viewDeleteMenu = makeMenuItem("menu.view.delete",
+                new ActionListener()
+                {
+                    public void actionPerformed(ActionEvent e)
+                    {
+                        control.deleteLocation();
+                    }
+                }));
+        menuItemsDisabledDuringRun.add(viewDeleteMenu);
 
         menu.add(makeMenuItem("menu.view.zoomin", new ActionListener()
         {
@@ -454,13 +455,14 @@ public class WorldFrame<T> extends JFrame
 
         setRunMenuItemsEnabled(true);
         setJMenuBar(mbar);
+        //*/
     }
 
     private void makeNewGridMenu()
     {
-        newGridMenu.removeAll();
-        MenuMaker<T> maker = new MenuMaker<T>(this, resources, displayMap);
-        maker.addConstructors(newGridMenu, gridClasses);
+        //~ newGridMenu.removeAll();
+        //~ MenuMaker<T> maker = new MenuMaker<T>(this, resources, displayMap);
+        //~ maker.addConstructors(newGridMenu, gridClasses);
     }
 
     /**
