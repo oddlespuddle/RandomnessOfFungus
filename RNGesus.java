@@ -7,7 +7,7 @@ import java.awt.Color;
 import javax.swing.Timer;
 
 public class RNGesus extends Actor{
-	public static final int DELAY = 500;
+	public static final int DELAY = 100;
 	private Timer colorTimer;
 	private final Floor floor;
 	

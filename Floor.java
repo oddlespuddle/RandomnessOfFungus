@@ -44,6 +44,10 @@ public class Floor extends World<Actor>
 		staircase = new Staircase();
 		staircase.putSelfInGrid(getGrid(), getRandomEmptyLocation());
 		
+		int enemyNumber = (int) (Math.random()*5);
+		for(int x = 0; x < enemyNumber; x++)
+			new Enemy().putSelfInGrid(getGrid(), getRandomEmptyLocation());
+		
 		Location playerLoc = getRandomEmptyLocation();
 		mask();
 		
@@ -68,9 +72,17 @@ public class Floor extends World<Actor>
 	
 	public void unmask(Location start)
 	{
-		for(Location loc : getGrid().getValidAdjacentLocations(start))
-			if(getGrid().get(loc) instanceof Mystery)
-				((Mystery) getGrid().get(loc)).reveal();
+		for(Actor myst : getGrid().getNeighbors(start))
+			if(myst instanceof Mystery)
+			{
+				Actor pot = ((Mystery) myst).reveal();
+				//~ if(pot instanceof Enemy)
+					//~ try
+					//~ {
+						//~ Test.main(null);
+					//~ }
+					//~ catch(Exception e){}
+			}
 	}
 	
 	/**
@@ -179,7 +191,7 @@ public class Floor extends World<Actor>
 		if(getGrid().isValid(pot))
 		{
 			Actor destination = getGrid().get(pot);
-			if(destination == null) //Destination will never be a Mystery
+			if(destination == null || destination instanceof Enemy) //Destination will never be a Mystery
 			{
 				player.moveTo(pot);
 				unmask(pot);
@@ -187,6 +199,7 @@ public class Floor extends World<Actor>
 			else if(getGrid().get(pot) == staircase)
 				overworld.nextFloor();
 		}
+		
 		return true;
 	}
 }

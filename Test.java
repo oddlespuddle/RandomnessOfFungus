@@ -23,7 +23,7 @@ public class Test{
 		//Frame Setup
 		JFrame frame = new JFrame();
 		frame.setSize(500, 500);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		//~ frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setBackground(Color.CYAN);
 		
 		//Panel Setup
