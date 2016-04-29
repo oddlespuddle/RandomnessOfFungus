@@ -21,6 +21,7 @@ import info.gridworld.grid.Grid;
 import info.gridworld.grid.Location;
 import info.gridworld.gui.WorldFrame;
 
+import java.awt.Container;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Set;
@@ -61,6 +62,11 @@ public class World<T>
         addGridClass("info.gridworld.grid.BoundedGrid");
         addGridClass("info.gridworld.grid.UnboundedGrid");
     }
+    
+    public void setContentPane(Container contentPane)
+    {
+		frame.setContentPane(contentPane);
+	}
 
     /**
      * Constructs and shows a frame for this world.

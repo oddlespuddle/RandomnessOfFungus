@@ -1,5 +1,4 @@
 import info.gridworld.actor.Actor;
-import info.gridworld.actor.Flower;
 import info.gridworld.actor.Rock;
 import info.gridworld.grid.BoundedGrid;
 import info.gridworld.grid.Grid;
@@ -14,8 +13,8 @@ public class Floor extends World<Actor>
 	//~ public static final Color PLAYER_COLOR = new Color(203, 152, 0);
 	public static final int SIDE_LENGTH = 10;
 	private Overworld overworld;
-	private Actor player;
-	private Actor staircase;
+	private Player player;
+	private Staircase staircase;
 	
 	/**
 	 * This constructor takes a reference to the overworld in which this
@@ -76,12 +75,12 @@ public class Floor extends World<Actor>
 			if(myst instanceof Mystery)
 			{
 				Actor pot = ((Mystery) myst).reveal();
-				//~ if(pot instanceof Enemy)
-					//~ try
-					//~ {
-						//~ Test.main(null);
-					//~ }
-					//~ catch(Exception e){}
+				if(pot instanceof Enemy)
+					try
+					{
+						setContentPane(new Battle());
+					}
+					catch(Exception e){}
 			}
 	}
 	

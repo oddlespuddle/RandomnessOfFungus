@@ -5,6 +5,8 @@ public class Overworld{
 	private int floorNumber;
 	
 	public static void main(String args[])throws Exception{
+		System.setProperty("info.gridworld.gui.selection" ,"hide");
+		System.setProperty("info.gridworld.gui.tooltips" ,"hide");
 		Overworld world = new Overworld();
 	}
 	

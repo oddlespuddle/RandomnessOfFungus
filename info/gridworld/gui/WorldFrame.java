@@ -76,15 +76,14 @@ public class WorldFrame<T> extends JFrame
 {
     //~ private GUIController<T> control;
     private GridPanel display;
-    private JTextArea messageArea;
-    private ArrayList<JMenuItem> menuItemsDisabledDuringRun;
     private World<T> world;
     private ResourceBundle resources;
     private DisplayMap displayMap;
 
     private Set<Class> gridClasses;
     private JMenu newGridMenu;
-
+	private JPanel content;
+	
     private static int count = 0;
 
     /**
@@ -130,8 +129,8 @@ public class WorldFrame<T> extends JFrame
         
         makeMenus();
 
-        JPanel content = new JPanel();
-        content.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        content = new JPanel();
+        //~ content.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         content.setLayout(new BorderLayout());
         setContentPane(content);
 
@@ -187,24 +186,29 @@ public class WorldFrame<T> extends JFrame
         //~ control = new GUIController<T>(this, display, displayMap, resources);
         //~ content.add(control.controlPanel(), BorderLayout.SOUTH);
 
-        messageArea = new JTextArea(2, 35);
-        messageArea.setEditable(false);
-        messageArea.setFocusable(false);
-        messageArea.setBackground(new Color(0xFAFAD2));
-        content.add(new JScrollPane(messageArea), BorderLayout.NORTH);
+        //~ messageArea = new JTextArea(2, 35);
+        //~ messageArea.setEditable(false);
+        //~ messageArea.setFocusable(false);
+        //~ messageArea.setBackground(new Color(0xFAFAD2));
+        //~ content.add(new JScrollPane(messageArea), BorderLayout.NORTH);
 
         pack();
         repaint(); // to show message
         display.setGrid(gr);
     }
 
+	public JPanel getPanel()
+	{
+		return content;
+	}
+
     public void repaint()
     {
         String message = getWorld().getMessage();
         if (message == null)
             message = resources.getString("message.default");
-        messageArea.setText(message);
-        messageArea.repaint();
+        //~ messageArea.setText(message);
+        //~ messageArea.repaint();
         display.repaint(); // for applet
         super.repaint();
     }
@@ -472,8 +476,8 @@ public class WorldFrame<T> extends JFrame
      */
     public void setRunMenuItemsEnabled(boolean enable)
     {
-        for (JMenuItem item : menuItemsDisabledDuringRun)
-            item.setEnabled(enable);
+        //~ for (JMenuItem item : menuItemsDisabledDuringRun)
+            //~ item.setEnabled(enable);
     }
 
     /**
