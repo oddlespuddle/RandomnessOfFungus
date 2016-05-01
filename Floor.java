@@ -1,3 +1,12 @@
+/**
+ * Floor class provides a grid in which the overworld of the game takes
+ * place, tracking the player, enemies, traps, loot, and starting battles
+ * when necessary.
+ * @author Alexander Wong and Jiaming Chen
+ * Period: 2
+ * Date: 2016-04-30 (ISO)
+ */
+
 import info.gridworld.actor.Actor;
 import info.gridworld.actor.Rock;
 import info.gridworld.grid.BoundedGrid;
@@ -7,21 +16,34 @@ import info.gridworld.world.World;
 import java.awt.Color;
 import java.awt.Container;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Floor extends World<Actor>
 {
-	//~ public static final Color PLAYER_COLOR = new Color(203, 152, 0);
-	public static final int SIDE_LENGTH = 10;
+	private static final int SIDE_LENGTH = 10;
+	private static final Map<String, Integer> KEY_DIRECTION;
+	
+	static
+	{
+		KEY_DIRECTION = new HashMap<>();
+		KEY_DIRECTION.put("W", Location.NORTH);
+		KEY_DIRECTION.put("A", Location.WEST);
+		KEY_DIRECTION.put("S", Location.SOUTH);
+		KEY_DIRECTION.put("D", Location.EAST);
+	} 
+	
 	private Overworld overworld;
 	private Player player;
 	private Staircase staircase;
 	private Container overworldPane;
 	
 	/**
-	 * This constructor takes a reference to the overworld in which this
-	 * floor is located. It generates the grid and the maze, then places
-	 * the player and staircase.
+	 * Takes a reference to the overworld in which this
+	 * floor is located. It also stores the current contentPane which
+	 * is necessary to return to the overworld from battles.
+	 * @param overworld - the Overworld object that contains this Floor.
 	 */
 	public Floor(Overworld overworld)
 	{
@@ -32,14 +54,13 @@ public class Floor extends World<Actor>
 	}
 	
 	/**
-	 * This method sets the message to inform the user of the floor number
-	 * and controls, creates a new grid, populates it with rocks to form
-	 * a maze, places the staircase, masks all pieces except the player and
-	 * 
+	 * Sets the window title to the game title and floor number
+	 * creates a new grid, populates it with all game Actors, then masks
+	 * all spaces of the board except the user.
 	 */
 	public void nextFloor()
 	{
-		setMessage("Welcome to floor " + overworld.getFloorNumber() + "!\nUse WASD to move!");
+		getWorldFrame().setTitle("Randomness of Fungus - Floor " + overworld.getFloorNumber());
 		setGrid(new BoundedGrid<Actor>(SIDE_LENGTH, SIDE_LENGTH));
 		generateMaze();
 		
@@ -58,9 +79,12 @@ public class Floor extends World<Actor>
 		unmask(player.getLocation());
 	}
 	
+	/**
+	 * Hides the value of all tiles by populating them with Mystery objects
+	 * containing the values that actually belong in those tiles.
+	 */
 	public void mask()
 	{
-		//Fill the board with walls
 		for(int r = 0; r < getGrid().getNumRows(); r++)
 			for(int c = 0; c < getGrid().getNumCols(); c++)
 			{
@@ -72,12 +96,21 @@ public class Floor extends World<Actor>
 			}
 	}
 	
+	/**
+	 * Resets the frame to view and focus on the overworld, as opposed
+	 * to the battle scene.
+	 */
 	public void overworldReturn()
 	{
 		setContentPane(overworldPane);
 		getWorldFrame().requestFocusInWindow();
 	}
 	
+	/**
+	 * Unboxes all Mystery objects adjacent to a given location, making 
+	 * them visible to the player.
+	 * @param start - the location of the tile whose neighbors shall unbox
+	 */
 	public void unmask(Location start)
 	{
 		for(Actor myst : getGrid().getNeighbors(start))
@@ -86,48 +119,34 @@ public class Floor extends World<Actor>
 	}
 	
 	/**
-	 * This method populates the grid with rocks in a maze like fashion
-	 * using a randomized Prim's algorithm
+	 * Populates the grid with rocks in a maze like fashion
+	 * using the randomized Prim's algorithm
 	 */
 	private void generateMaze()
 	{
-		//Fill the board with walls
 		for(int r = 0; r < getGrid().getNumRows(); r++)
 			for(int c = 0; c < getGrid().getNumCols(); c++)
 				new Rock().putSelfInGrid(getGrid(), new Location(r, c));
 		
-		//Pick a starting point and free it
 		int randRow = (int) (Math.random()*getGrid().getNumRows());
 		int randCol = (int) (Math.random()*getGrid().getNumCols());
 		getGrid().remove(new Location(randRow, randCol));
 		
-		//Add all neighbours of the starting point
 		List<Location> walls = new ArrayList<>();
 		walls.addAll(getPrimNeighbours(new Location(randRow, randCol)));
-		
-		//Exhaust all neighbours
 		while(!walls.isEmpty())
 		{
-			//Pick a random point of expansion
 			Location randomFrontier = walls.remove((int) (Math.random()*walls.size()));
-			
-			//Make a list of neighbours who are not walls
 			List<Location> freeNeighbours = new ArrayList<>();
 			for(Location loc : getPrimNeighbours(randomFrontier))
 				if(getGrid().get(loc) == null)
 					freeNeighbours.add(loc);
-				//Neighbours that are walls are added to the frontier if not already
 				else if(!walls.contains(loc))
 					walls.add(loc);
 			
-			//Pick a random non-wall neighbour
 			Location randomFree = freeNeighbours.get((int) (Math.random()*freeNeighbours.size()));
-			
-			//And the point between the random frontier point and its neighbour
 			Location randomMiddle = new Location((randomFrontier.getRow() + randomFree.getRow())/2,
 												(randomFrontier.getCol() + randomFree.getCol())/2);
-			
-			//And remove them both.
 			getGrid().remove(randomFrontier);
 			getGrid().remove(randomMiddle);
 		}
@@ -135,7 +154,7 @@ public class Floor extends World<Actor>
 	
 	/**
 	 * Returns a list of all locations that are two tiles away from a
-	 * given location in a cardinal direction which are also within the
+	 * given location in any cardinal direction which are also within the
 	 * boundaries of the grid.
 	 * 
 	 * @param loc - The location from which neighbours will be found.
@@ -156,10 +175,7 @@ public class Floor extends World<Actor>
 	}
 	
 	/**
-	 * This method is called when a key was pressed. 
-	 * It is overridden to consume the W, A, S, and D keys as arrow keys
-	 * and uses them to move the player sprite around the grid.
-	 * 
+	 * Moves the player when the W, A, S, or D keys are pressed.
 	 * Both parameters are supplied by the GridWorld GUI.
 	 * 
 	 * @param description - The string describing the key pressed 
@@ -168,25 +184,11 @@ public class Floor extends World<Actor>
 	 * consume it.
 	 */
 	@Override
-	public boolean keyPressed(String description, Location loc){
+	public boolean keyPressed(String description, Location loc)
+	{
 		Location pot = null;
-		switch(description)
-		{
-			case "W":
-				pot = player.getLocation().getAdjacentLocation(Location.NORTH);
-				break;
-			case "A":
-				pot = player.getLocation().getAdjacentLocation(Location.WEST);
-				break;
-			case "S":
-				pot = player.getLocation().getAdjacentLocation(Location.SOUTH);
-				break;
-			case "D":
-				pot = player.getLocation().getAdjacentLocation(Location.EAST);
-				break;
-			default:
-				return false;
-		}
+		if(KEY_DIRECTION.containsKey(description))
+			pot = player.getLocation().getAdjacentLocation(KEY_DIRECTION.get(description));
 		
 		if(getGrid().isValid(pot))
 		{
@@ -197,20 +199,17 @@ public class Floor extends World<Actor>
 				Battle battle = new Battle(this);
 				setContentPane(battle);
 				battle.requestFocusInWindow();
-				
-				super.validate();
-				super.repaint();
 			}
 			
-			if(destination == null || destination instanceof Enemy) //Destination will never be a Mystery
+			if(destination == null || destination instanceof Enemy) 
 			{
 				player.moveTo(pot);
 				unmask(pot);
 			}
-			else if(getGrid().get(pot) == staircase)
+			if(getGrid().get(pot) == staircase)
 				overworld.nextFloor();
 		}
 		
-		return true;
+		return pot != null;
 	}
 }
