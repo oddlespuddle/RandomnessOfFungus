@@ -1,6 +1,5 @@
 /**
- * Staircase class is an Actor representing the exit from a Overworld of the
- * GameViewer.
+ * Staircase class is an Actor representing the exit from a floor of the Overworld.
  * @author Alexander Wong and Jiaming Chen
  * Period: 2
  * Date: 2016-05-01 (ISO)

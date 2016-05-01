@@ -33,9 +33,11 @@ import javax.swing.JTextField;
 
 public class Battle extends JPanel
 {
+	private static final String[] enemies = {"RickAstley", "NyanCat", "Troll"};
 	private static final List<Integer> userInputs = new LinkedList<>();
 	private Overworld floor;
-
+	private String enemy;
+	
 	/**
 	 * Stores a reference to the floor whose GUI must be returned to after
 	 * this battle, adds scenery and music, and responds to user input.
@@ -45,6 +47,7 @@ public class Battle extends JPanel
 	{
 		setFocusable(true);
 		this.floor = floor;
+		this.enemy = enemies[(int) (Math.random()*enemies.length)];
 		addComponents();
 		takeInput();
 	}
@@ -64,10 +67,10 @@ public class Battle extends JPanel
 		c.weighty = 1.0;
 		c.fill = GridBagConstraints.BOTH;
 		
-		this.add(centeredTextBox("YOU ARE EXPERIENCING AN APPARITION OF RNGESUS", Color.GRAY), c);
+		this.add(centeredTextBox("YOU ARE EXPERIENCING AN APPARITION OF " + enemy.toUpperCase(), Color.GRAY), c);
 		c.gridy++;
 		
-		this.add(pictureLabel("EnemySprites/RNGesusSprite.jpg"), c);
+		this.add(pictureLabel("EnemySprites/" + enemy + ".jpg"), c);
 		c.gridy++;
 
 		this.add(centeredTextBox("Options:", Color.GRAY), c);
@@ -86,7 +89,7 @@ public class Battle extends JPanel
 	 */
 	private void takeInput()
 	{
-		final Clip clip = themeClip("EnemyMusic/RickRoll.wav");
+		final Clip clip = themeClip("EnemyMusic/" + enemy + ".wav");
 		if(clip != null)
 			clip.loop(Clip.LOOP_CONTINUOUSLY);
 		

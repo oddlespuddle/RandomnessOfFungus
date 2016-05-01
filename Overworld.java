@@ -14,8 +14,8 @@ import info.gridworld.grid.Grid;
 import info.gridworld.grid.Location;
 import info.gridworld.world.World;
 import java.awt.Container;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,8 +33,8 @@ public class Overworld extends World<Actor>
 		KEY_DIRECTION.put("D", Location.EAST);
 	} 
 	
-	private Player player;
-	private Staircase staircase;
+	private Actor player;
+	private Actor staircase;
 	private Container overworldPane;
 	private int floorNumber;
 	
@@ -54,7 +54,7 @@ public class Overworld extends World<Actor>
 	 * Takes a reference to the overworld in which this
 	 * floor is located. It also stores the current contentPane which
 	 * is necessary to return to the overworld from battles.
-	 * @param overworld - the GameViewer object that contains this Overworld.
+	 * @param overworld - the Overworld object that contains this Overworld.
 	 */
 	public Overworld()
 	{
@@ -157,12 +157,12 @@ public class Overworld extends World<Actor>
 		int randCol = (int) (Math.random()*getGrid().getNumCols());
 		getGrid().remove(new Location(randRow, randCol));
 		
-		List<Location> walls = new ArrayList<>();
+		List<Location> walls = new LinkedList<>();
 		walls.addAll(getPrimNeighbours(new Location(randRow, randCol)));
 		while(!walls.isEmpty())
 		{
 			Location randomFrontier = walls.remove((int) (Math.random()*walls.size()));
-			List<Location> freeNeighbours = new ArrayList<>();
+			List<Location> freeNeighbours = new LinkedList<>();
 			for(Location loc : getPrimNeighbours(randomFrontier))
 				if(getGrid().get(loc) == null)
 					freeNeighbours.add(loc);
@@ -187,7 +187,7 @@ public class Overworld extends World<Actor>
 	 */
 	private List<Location> getPrimNeighbours(Location loc)
 	{
-		List<Location> ret = new ArrayList<>();
+		List<Location> ret = new LinkedList<>();
 		for(int dr = -2; dr <= 2; dr += 2)
 			for(int dc = -2; dc <= 2; dc += 2)
 				if(dr == 0 ^ dc == 0)
