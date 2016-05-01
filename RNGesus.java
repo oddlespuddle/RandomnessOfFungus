@@ -1,6 +1,6 @@
 /**
  * RNGesus class is an Actor representing the boss from any 10th Floor 
- * of the Overworld.
+ * of the GameViewer.
  * @author Alexander Wong and Jiaming Chen
  * Period: 2
  * Date: 2016-04-30 (ISO)

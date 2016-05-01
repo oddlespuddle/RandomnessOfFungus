@@ -34,7 +34,7 @@ public class Floor extends World<Actor>
 		KEY_DIRECTION.put("D", Location.EAST);
 	} 
 	
-	private Overworld overworld;
+	private GameViewer overworld;
 	private Player player;
 	private Staircase staircase;
 	private Container overworldPane;
@@ -43,9 +43,9 @@ public class Floor extends World<Actor>
 	 * Takes a reference to the overworld in which this
 	 * floor is located. It also stores the current contentPane which
 	 * is necessary to return to the overworld from battles.
-	 * @param overworld - the Overworld object that contains this Floor.
+	 * @param overworld - the GameViewer object that contains this Floor.
 	 */
-	public Floor(Overworld overworld)
+	public Floor(GameViewer overworld)
 	{
 		super();
 		this.overworld = overworld;

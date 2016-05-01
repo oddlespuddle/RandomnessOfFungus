@@ -1,5 +1,5 @@
 /**
- * Overworld class is the main class of this project, which uses the
+ * GameViewer class is the main class of this project, which uses the
  * Floor class to provide an overworld and user interface to this game.
  * @author Alexander Wong and Jiaming Chen
  * Period: 2
@@ -8,7 +8,7 @@
 
 import info.gridworld.world.World;
 
-public class Overworld{
+public class GameViewer{
 	private Floor floor;
 	private int floorNumber;
 	
@@ -21,14 +21,14 @@ public class Overworld{
 	{
 		System.setProperty("info.gridworld.gui.selection" ,"hide");
 		System.setProperty("info.gridworld.gui.tooltips" ,"hide");
-		Overworld world = new Overworld();
+		GameViewer world = new GameViewer();
 	}
 	
 	/**
 	 * Sets the floor number to 1, creates a new floor, and initializes
 	 * the GUI.
 	 */
-	public Overworld()
+	public GameViewer()
 	{
 		floorNumber = 1;
 		floor = new Floor(this);
