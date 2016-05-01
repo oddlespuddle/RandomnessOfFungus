@@ -37,7 +37,8 @@ public class Battle extends JPanel
 	private static final List<Integer> userInputs = new LinkedList<>();
 	private Overworld floor;
 	private String enemy;
-	
+	private JTextField message;
+	private int defeatMoves;
 	/**
 	 * Stores a reference to the floor whose GUI must be returned to after
 	 * this battle, adds scenery and music, and responds to user input.
@@ -45,9 +46,12 @@ public class Battle extends JPanel
 	 */
 	public Battle(Overworld floor)
 	{
-		setFocusable(true);
 		this.floor = floor;
 		this.enemy = enemies[(int) (Math.random()*enemies.length)];
+		this.defeatMoves = (int) Math.round(Math.log(floor.getFloorNumber()) + 1);
+		this.message = centeredTextBox("YOU ARE EXPERIENCING AN APPARITION OF " + enemy.toUpperCase(), Color.GRAY);
+
+		setFocusable(true);
 		addComponents();
 		takeInput();
 	}
@@ -67,7 +71,7 @@ public class Battle extends JPanel
 		c.weighty = 1.0;
 		c.fill = GridBagConstraints.BOTH;
 		
-		this.add(centeredTextBox("YOU ARE EXPERIENCING AN APPARITION OF " + enemy.toUpperCase(), Color.GRAY), c);
+		this.add(message, c);
 		c.gridy++;
 		
 		this.add(pictureLabel("EnemySprites/" + enemy + ".jpg"), c);
@@ -77,7 +81,7 @@ public class Battle extends JPanel
 		c.gridy++;
 		
 		JPanel options = new JPanel(new GridLayout(2, 2));
-		for(int gridx = 0; gridx < 4; gridx++)
+		for(int gridx = 1; gridx <= 4; gridx++)
 			options.add(centeredTextBox(""+gridx, Color.GRAY));
 		
 		this.add(options, c);
@@ -90,6 +94,7 @@ public class Battle extends JPanel
 	private void takeInput()
 	{
 		final Clip clip = themeClip("EnemyMusic/" + enemy + ".wav");
+		final int startLength = userInputs.size();
 		if(clip != null)
 			clip.loop(Clip.LOOP_CONTINUOUSLY);
 		
@@ -100,10 +105,12 @@ public class Battle extends JPanel
 				char c = e.getKeyChar();
 				if(c >= '1' && c <= '4')
 				{
-					//~ userInputs.add(Character.getNumericValue(c));
-					if(clip != null)
+					userInputs.add(Character.getNumericValue(c));
+					if(userInputs.size() - startLength == defeatMoves && clip != null)
+					{
 						clip.stop();
-					overworldReturn();
+						overworldReturn();
+					}
 				}
 			}
 			

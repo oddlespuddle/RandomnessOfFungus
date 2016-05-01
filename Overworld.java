@@ -94,6 +94,15 @@ public class Overworld extends World<Actor>
 	}
 	
 	/**
+	 * Returns the current floor number.
+	 * @return the current floor number.
+	 */
+	public int getFloorNumber()
+	{
+		return floorNumber;
+	}
+	
+	/**
 	 * Hides the value of all tiles by populating them with Mystery objects
 	 * containing the values that actually belong in those tiles.
 	 */
