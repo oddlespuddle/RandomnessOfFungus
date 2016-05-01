@@ -33,6 +33,8 @@ public class Overworld{
 		floorNumber = 1;
 		floor = new Floor(this);
 		show();
+		if(floor.getWorldFrame() != null)
+			floor.getWorldFrame().setTitle("Randomness of Fungus - Floor " + floorNumber);
 	}
 	
 	/**

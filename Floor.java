@@ -60,7 +60,6 @@ public class Floor extends World<Actor>
 	 */
 	public void nextFloor()
 	{
-		getWorldFrame().setTitle("Randomness of Fungus - Floor " + overworld.getFloorNumber());
 		setGrid(new BoundedGrid<Actor>(SIDE_LENGTH, SIDE_LENGTH));
 		generateMaze();
 		
@@ -104,6 +103,18 @@ public class Floor extends World<Actor>
 	{
 		setContentPane(overworldPane);
 		getWorldFrame().requestFocusInWindow();
+		validate();
+		repaint();
+	}
+	
+	private void doBattle()
+	{
+		this.overworldPane = getContentPane();
+		Battle battle = new Battle(this);
+		setContentPane(battle);
+		battle.requestFocusInWindow();
+		validate();
+		repaint();
 	}
 	
 	/**
@@ -190,16 +201,11 @@ public class Floor extends World<Actor>
 		if(KEY_DIRECTION.containsKey(description))
 			pot = player.getLocation().getAdjacentLocation(KEY_DIRECTION.get(description));
 		
-		if(getGrid().isValid(pot))
+		if(pot != null && getGrid().isValid(pot))
 		{
 			Actor destination = getGrid().get(pot);
 			if(destination instanceof Enemy)
-			{
-				this.overworldPane = getContentPane();
-				Battle battle = new Battle(this);
-				setContentPane(battle);
-				battle.requestFocusInWindow();
-			}
+				doBattle();
 			
 			if(destination == null || destination instanceof Enemy) 
 			{
