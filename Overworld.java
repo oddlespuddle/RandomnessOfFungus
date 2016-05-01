@@ -1,10 +1,10 @@
 /**
  * Overworld class provides a grid in which the overworld of the game takes
- * place, tracking the player, staircase, enemies, traps, loot, and starting
- * battles when necessary.
+ * place, tracking the player, enemies, traps, loot, and starting battles
+ * when necessary.
  * @author Alexander Wong and Jiaming Chen
  * Period: 2
- * Date: 2016-05-01 (ISO)
+ * Date: 2016-04-30 (ISO)
  */
 
 import info.gridworld.actor.Actor;
@@ -13,6 +13,7 @@ import info.gridworld.grid.BoundedGrid;
 import info.gridworld.grid.Grid;
 import info.gridworld.grid.Location;
 import info.gridworld.world.World;
+import java.awt.Color;
 import java.awt.Container;
 import java.util.HashMap;
 import java.util.LinkedList;
