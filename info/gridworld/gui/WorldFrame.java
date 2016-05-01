@@ -92,6 +92,7 @@ public class WorldFrame<T> extends JFrame
      */
     public WorldFrame(World<T> world)
     {
+		setResizable(false);
         this.world = world;
         count++;
         resources = ResourceBundle
@@ -119,7 +120,7 @@ public class WorldFrame<T> extends JFrame
 
         displayMap = new DisplayMap();
         String title = System.getProperty("info.gridworld.gui.frametitle");
-        if (title == null) title = resources.getString("frame.title"); 
+        if (title == null) title = "Randomness of Fungus"; 
         setTitle(title);
         setLocation(25, 15);
 
@@ -204,12 +205,12 @@ public class WorldFrame<T> extends JFrame
 
     public void repaint()
     {
-        String message = getWorld().getMessage();
-        if (message == null)
-            message = resources.getString("message.default");
+        //~ String message = getWorld().getMessage();
+        //~ if (message == null)
+            //~ message = resources.getString("message.default");
         //~ messageArea.setText(message);
         //~ messageArea.repaint();
-        display.repaint(); // for applet
+        //~ display.repaint(); // for applet
         super.repaint();
     }
 

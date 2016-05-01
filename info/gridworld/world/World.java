@@ -270,11 +270,30 @@ public class World<T>
         return occupantClassNames;
     }
 
-    private void repaint()
+    public void repaint()
     {
         if (frame != null)
             frame.repaint();
     }
+
+	public WorldFrame<T> getWorldFrame()
+	{
+		return frame;
+	}
+
+    public void validate()
+    {
+        if (frame != null)
+            frame.validate();
+    }
+
+	public Container getContentPane()
+	{
+		if(frame != null)
+			return frame.getContentPane();
+		else
+			return null;
+	}
 
     /**
      * Returns a string that shows the positions of the grid occupants.

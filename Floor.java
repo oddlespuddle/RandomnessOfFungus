@@ -5,6 +5,7 @@ import info.gridworld.grid.Grid;
 import info.gridworld.grid.Location;
 import info.gridworld.world.World;
 import java.awt.Color;
+import java.awt.Container;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,7 @@ public class Floor extends World<Actor>
 	private Overworld overworld;
 	private Player player;
 	private Staircase staircase;
+	private Container overworldPane;
 	
 	/**
 	 * This constructor takes a reference to the overworld in which this
@@ -25,6 +27,7 @@ public class Floor extends World<Actor>
 	{
 		super();
 		this.overworld = overworld;
+		this.overworldPane = getContentPane();
 		nextFloor();
 	}
 	
@@ -43,7 +46,7 @@ public class Floor extends World<Actor>
 		staircase = new Staircase();
 		staircase.putSelfInGrid(getGrid(), getRandomEmptyLocation());
 		
-		int enemyNumber = (int) (Math.random()*5);
+		int enemyNumber = 5;//(int) (Math.random()*5);
 		for(int x = 0; x < enemyNumber; x++)
 			new Enemy().putSelfInGrid(getGrid(), getRandomEmptyLocation());
 		
@@ -69,19 +72,17 @@ public class Floor extends World<Actor>
 			}
 	}
 	
+	public void overworldReturn()
+	{
+		setContentPane(overworldPane);
+		getWorldFrame().requestFocusInWindow();
+	}
+	
 	public void unmask(Location start)
 	{
 		for(Actor myst : getGrid().getNeighbors(start))
 			if(myst instanceof Mystery)
-			{
-				Actor pot = ((Mystery) myst).reveal();
-				if(pot instanceof Enemy)
-					try
-					{
-						setContentPane(new Battle());
-					}
-					catch(Exception e){}
-			}
+				((Mystery) myst).reveal();
 	}
 	
 	/**
@@ -190,6 +191,17 @@ public class Floor extends World<Actor>
 		if(getGrid().isValid(pot))
 		{
 			Actor destination = getGrid().get(pot);
+			if(destination instanceof Enemy)
+			{
+				this.overworldPane = getContentPane();
+				Battle battle = new Battle(this);
+				setContentPane(battle);
+				battle.requestFocusInWindow();
+				
+				super.validate();
+				super.repaint();
+			}
+			
 			if(destination == null || destination instanceof Enemy) //Destination will never be a Mystery
 			{
 				player.moveTo(pot);
