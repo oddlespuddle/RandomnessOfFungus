@@ -3,7 +3,7 @@
  * within the current floor of the GameViewer.
  * @author Alexander Wong and Jiaming Chen
  * Period: 2
- * Date: 2016-04-30 (ISO)
+ * Date: 2016-05-01 (ISO)
  */
 
 import info.gridworld.actor.Actor;
