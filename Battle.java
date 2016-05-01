@@ -27,11 +27,19 @@ import javax.swing.Timer;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.sound.sampled.LineUnavailableException;
+import java.io.File;
+import java.io.IOException;
+
 public class Battle extends JPanel
 {
 	private static final List<Integer> userInputs = new LinkedList<>();
 	private Floor floor;
-	
+
 	public static void main(String args[])
 	{
 		//Frame Setup
@@ -70,6 +78,10 @@ public class Battle extends JPanel
 		
 		this.add(options, c);
 		
+        final Clip clip = themeClip("EnemyMusic/RickRoll.wav");
+        if(clip != null)
+			clip.loop(Clip.LOOP_CONTINUOUSLY);
+		
 		this.addKeyListener(new KeyListener() 
 		{
 			public void keyReleased(KeyEvent e)
@@ -79,6 +91,8 @@ public class Battle extends JPanel
 				if(c >= '1' && c <= '4')
 				{
 					//~ userInputs.add(Character.getNumericValue(c));
+					if(clip != null)
+						clip.stop();
 					overworldReturn();
 				}
 			}
@@ -86,6 +100,8 @@ public class Battle extends JPanel
 			public void keyTyped(KeyEvent e){}
 			public void keyPressed(KeyEvent e){}
 		});
+		
+		
 	}
 	
 	private void overworldReturn()
@@ -117,6 +133,32 @@ public class Battle extends JPanel
 			System.err.println("Missing file: " + fileName);
 			return new JLabel();
 		}
+	}
+
+	private static Clip themeClip(String fileName)
+	{
+		try
+		{
+			File soundFile = new File(fileName);
+			AudioSystem.getAudioInputStream(soundFile);
+			AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundFile);
+			Clip ret = AudioSystem.getClip(null);
+			ret.open(audioIn);
+			return ret;
+        }
+        catch(IOException e)
+        {
+			System.err.println("Missing file: " + fileName);
+		}
+		catch(UnsupportedAudioFileException uafe)
+		{
+			System.err.println("Unsupported Audio File: " + fileName);
+		}
+		catch(LineUnavailableException lue)
+		{
+			System.err.println("Unavailable line for: " + fileName);
+		}
+		return null;
 	}
 
 	private static double getChiSquared()
