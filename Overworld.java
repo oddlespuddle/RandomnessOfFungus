@@ -1,5 +1,5 @@
 /**
- * Floor class provides a grid in which the overworld of the game takes
+ * Overworld class provides a grid in which the overworld of the game takes
  * place, tracking the player, enemies, traps, loot, and starting battles
  * when necessary.
  * @author Alexander Wong and Jiaming Chen
@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Floor extends World<Actor>
+public class Overworld extends World<Actor>
 {
 	private static final int SIDE_LENGTH = 10;
 	private static final Map<String, Integer> KEY_DIRECTION;
@@ -34,22 +34,34 @@ public class Floor extends World<Actor>
 		KEY_DIRECTION.put("D", Location.EAST);
 	} 
 	
-	private GameViewer overworld;
 	private Player player;
 	private Staircase staircase;
 	private Container overworldPane;
+	private int floorNumber;
 	
+	/**
+	 * Provides creates a new overworld, initiating gameplay.
+	 * @param args - An array of command line positional arguments which
+	 * is conventionally required but in this case unusued.
+	 */
+	public static void main(String args[]) 
+	{
+		System.setProperty("info.gridworld.gui.selection" ,"hide");
+		System.setProperty("info.gridworld.gui.tooltips" ,"hide");
+		Overworld floor = new Overworld();
+	}
+
 	/**
 	 * Takes a reference to the overworld in which this
 	 * floor is located. It also stores the current contentPane which
 	 * is necessary to return to the overworld from battles.
-	 * @param overworld - the GameViewer object that contains this Floor.
+	 * @param overworld - the GameViewer object that contains this Overworld.
 	 */
-	public Floor(GameViewer overworld)
+	public Overworld()
 	{
 		super();
-		this.overworld = overworld;
 		this.overworldPane = getContentPane();
+		this.floorNumber = 0;
 		nextFloor();
 	}
 	
@@ -66,7 +78,7 @@ public class Floor extends World<Actor>
 		staircase = new Staircase();
 		staircase.putSelfInGrid(getGrid(), getRandomEmptyLocation());
 		
-		int enemyNumber = 5;//(int) (Math.random()*5);
+		int enemyNumber = 5;
 		for(int x = 0; x < enemyNumber; x++)
 			new Enemy().putSelfInGrid(getGrid(), getRandomEmptyLocation());
 		
@@ -76,6 +88,9 @@ public class Floor extends World<Actor>
 		player = new Player();
 		player.putSelfInGrid(getGrid(), playerLoc);
 		unmask(player.getLocation());
+		floorNumber++;
+		show();
+		getWorldFrame().setTitle("Randomness of Fungus - Overworld " + floorNumber);
 	}
 	
 	/**
@@ -213,7 +228,7 @@ public class Floor extends World<Actor>
 				unmask(pot);
 			}
 			if(getGrid().get(pot) == staircase)
-				overworld.nextFloor();
+				nextFloor();
 		}
 		
 		return pot != null;

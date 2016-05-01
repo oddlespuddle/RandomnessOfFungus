@@ -1,5 +1,5 @@
 /**
- * RNGesus class is an Actor representing the boss from any 10th Floor 
+ * RNGesus class is an Actor representing the boss from any 10th Overworld 
  * of the GameViewer.
  * @author Alexander Wong and Jiaming Chen
  * Period: 2
@@ -14,7 +14,7 @@ import javax.swing.Timer;
 
 public class RNGesus extends Actor{
 	public static final int DELAY = 100;
-	private final Floor floor;
+	private final Overworld floor;
 	private Timer colorTimer;
 	
 	/**
@@ -23,7 +23,7 @@ public class RNGesus extends Actor{
 	 * to time that color changing effect.
 	 * @param floor - the floor containing this RNGesus
 	 */
-	public RNGesus(final Floor floor)
+	public RNGesus(final Overworld floor)
 	{
 		super();
 		this.floor = floor;

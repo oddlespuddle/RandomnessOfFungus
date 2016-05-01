@@ -34,14 +34,14 @@ import javax.swing.JTextField;
 public class Battle extends JPanel
 {
 	private static final List<Integer> userInputs = new LinkedList<>();
-	private Floor floor;
+	private Overworld floor;
 
 	/**
 	 * Stores a reference to the floor whose GUI must be returned to after
 	 * this battle, adds scenery and music, and responds to user input.
 	 * @param floor - the floor to which the GUI must return.
 	 */
-	public Battle(Floor floor)
+	public Battle(Overworld floor)
 	{
 		setFocusable(true);
 		this.floor = floor;
@@ -110,7 +110,7 @@ public class Battle extends JPanel
 	}
 	
 	/**
-	 * Ends the battle by returning the GUI to the Floor.
+	 * Ends the battle by returning the GUI to the Overworld.
 	 */
 	private void overworldReturn()
 	{
