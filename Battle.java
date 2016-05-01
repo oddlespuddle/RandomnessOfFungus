@@ -33,7 +33,7 @@ import javax.swing.JTextField;
 
 public class Battle extends JPanel
 {
-	private static final String[] enemies = {"RickAstley", "NyanCat", "Troll"};
+	private static final String[] enemies = {"RickAstley", "NyanCat", "Troll", "Mudkipz"};
 	private static final List<Integer> userInputs = new LinkedList<>();
 	private Overworld floor;
 	private String enemy;

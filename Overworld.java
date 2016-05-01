@@ -90,7 +90,7 @@ public class Overworld extends World<Actor>
 		unmask(player.getLocation());
 		floorNumber++;
 		show();
-		getWorldFrame().setTitle("Randomness of Fungus - Overworld " + floorNumber);
+		getWorldFrame().setTitle("Randomness of Fungus - Floor " + floorNumber);
 	}
 	
 	/**
