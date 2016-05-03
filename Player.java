@@ -1,6 +1,6 @@
 /**
  * Player class is an Actor representing the player's own movable character
- * within the current floor of the Overworld
+ * within the current floor of the GameViewer.
  * @author Alexander Wong and Jiaming Chen
  * Period: 2
  * Date: 2016-04-30 (ISO)

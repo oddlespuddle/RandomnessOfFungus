@@ -10,6 +10,8 @@ import java.awt.Color;
 
 public class Enemy extends Actor{
 	public static final Color ENEMY_COLOR = Color.WHITE;
+	private EnemyType type;
+	private int turns;
 	
 	/**
 	 * Creates the Enemy object with an appropriate color that really
@@ -18,6 +20,21 @@ public class Enemy extends Actor{
 	public Enemy()
 	{
 		super();
+		type = EnemyType.TEST_ENEMY;
+		turns = 5;
 		setColor(ENEMY_COLOR);
 	}
+	
+	public Enemy(EnemyType type, int turns)
+	{
+		super();
+		this.type = type;
+		this.turns = turns;
+		setColor(ENEMY_COLOR);
+	}
+	
+	public EnemyType getEnemyType() {
+		return type;
+	}
+	
 }

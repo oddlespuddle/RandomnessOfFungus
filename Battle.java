@@ -17,6 +17,8 @@ import java.awt.Image;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import javax.imageio.ImageIO;
@@ -33,25 +35,26 @@ import javax.swing.JTextField;
 
 public class Battle extends JPanel
 {
-	private static final String[] enemies = {"RickAstley", "NyanCat", "Troll", "Mudkipz"};
+	public static final double ALPHA = .05;
+	public static final int NUM_OPTIONS = 4;
+	private final Clip clip; 
 	private static final List<Integer> userInputs = new LinkedList<>();
 	private Overworld floor;
-	private String enemy;
-	private JTextField message;
-	private int defeatMoves;
+	private int turnsLeft;
+	private Enemy enemy;
+
 	/**
 	 * Stores a reference to the floor whose GUI must be returned to after
 	 * this battle, adds scenery and music, and responds to user input.
 	 * @param floor - the floor to which the GUI must return.
 	 */
-	public Battle(Overworld floor)
+	public Battle(Overworld floor, Enemy enemy, int turns)
 	{
-		this.floor = floor;
-		this.enemy = enemies[(int) (Math.random()*enemies.length)];
-		this.defeatMoves = (int) Math.round(Math.log(floor.getFloorNumber()) + 1);
-		this.message = centeredTextBox("YOU ARE EXPERIENCING AN APPARITION OF " + enemy.toUpperCase(), Color.GRAY);
-
 		setFocusable(true);
+		this.floor = floor;
+		this.enemy = enemy;
+		turnsLeft = turns;
+		clip = themeClip(enemy.getEnemyType().getMusicPath());
 		addComponents();
 		takeInput();
 	}
@@ -71,17 +74,17 @@ public class Battle extends JPanel
 		c.weighty = 1.0;
 		c.fill = GridBagConstraints.BOTH;
 		
-		this.add(message, c);
+		this.add(centeredTextBox(enemy.getEnemyType().getText(), Color.GRAY), c);
 		c.gridy++;
 		
-		this.add(pictureLabel("EnemySprites/" + enemy + ".jpg"), c);
+		this.add(pictureLabel(enemy.getEnemyType().getSpritePath()), c);
 		c.gridy++;
 
 		this.add(centeredTextBox("Options:", Color.GRAY), c);
 		c.gridy++;
 		
 		JPanel options = new JPanel(new GridLayout(2, 2));
-		for(int gridx = 1; gridx <= 4; gridx++)
+		for(int gridx = 0; gridx < 4; gridx++)
 			options.add(centeredTextBox(""+gridx, Color.GRAY));
 		
 		this.add(options, c);
@@ -93,8 +96,6 @@ public class Battle extends JPanel
 	 */
 	private void takeInput()
 	{
-		final Clip clip = themeClip("EnemyMusic/" + enemy + ".wav");
-		final int startLength = userInputs.size();
 		if(clip != null)
 			clip.loop(Clip.LOOP_CONTINUOUSLY);
 		
@@ -105,12 +106,7 @@ public class Battle extends JPanel
 				char c = e.getKeyChar();
 				if(c >= '1' && c <= '4')
 				{
-					userInputs.add(Character.getNumericValue(c));
-					if(userInputs.size() - startLength == defeatMoves && clip != null)
-					{
-						clip.stop();
-						overworldReturn();
-					}
+					takeTurn(c - '1');
 				}
 			}
 			
@@ -120,10 +116,25 @@ public class Battle extends JPanel
 	}
 	
 	/**
+	 * Processes a turn by the player
+	 * @param input the option selected by the player
+	 */
+	private void takeTurn(int input)
+	{
+		userInputs.add(input);
+		testForRandomness();
+		if (--turnsLeft == 0)
+			overworldReturn();
+	}
+	
+	/**
 	 * Ends the battle by returning the GUI to the Overworld.
 	 */
 	private void overworldReturn()
 	{
+		if(clip != null)
+			clip.stop();
+
 		if(floor != null)
 			floor.overworldReturn();
 	}
@@ -199,25 +210,47 @@ public class Battle extends JPanel
 		}
 		return null;
 	}
-
+	
 	/**
-	 * Performs a chi squared statistical test on all user inputs throughout
-	 * the game so far.
-	 * @return a value in [0, 1] describing randomness, with 1 being more
-	 *         random than 0.
+	 * Tests the randomness of the input history of the player and causes the 
+	 * player to lose if the results do not meet the randomness threshold.
 	 */
-	private static double getChiSquared()
+	private void testForRandomness()
 	{
-		return chiSquaredUniformityTest(userInputs);
+		int maxGroupSize = (int) (Math.log(userInputs.size() / 5.0) / Math.log(NUM_OPTIONS));
+		for (int groupSize = 1; groupSize <= maxGroupSize; groupSize++) 
+		{
+			int numGroups = (int) Math.pow(NUM_OPTIONS, groupSize);
+			
+			if (userInputs.size() % groupSize != 0)
+				continue;
+			
+			Iterator<Integer> it = userInputs.iterator();
+			int[] frequencies = new int[numGroups];
+			while (it.hasNext()) {
+				int n = 0;
+				for (int j = 0; j < groupSize; j++) 
+				{
+					n *= 4;
+					n += it.next();
+				}
+				frequencies[n]++;
+			}
+			double pValue = chiSquaredUniformityTest(frequencies);
+			if (pValue <= ALPHA)
+			{
+				//player loses
+			}
+		}
 	}
 
 	/**
 	 * Performs a chi squared statistical test on a given list of Integers
-	 * @param data - a list of Integers on which to perform analysis
+	 * @param data - an array of integers on which to perform analysis
 	 * @return a value in [0, 1] describing randomness, with 1 being more
 	 *         random than 0.
 	 */
-	private static double chiSquaredUniformityTest(List<Integer> data) 
+	private static double chiSquaredUniformityTest(int[] data) 
 	{
 		int total = 0;
 		for (int n : data)
@@ -226,11 +259,11 @@ public class Battle extends JPanel
 		double chiSquared = 0;
 		for (int n : data) 
 		{
-			double expected = (double) total / data.size();
+			double expected = (double) total / data.length;
 			double diff = n - expected;
 			chiSquared += diff * diff / expected;
 		}
-		return 1 - chiSquaredCDF(chiSquared, data.size() - 1);
+		return 1 - chiSquaredCDF(chiSquared, data.length - 1);
 	}
 	
 	/**
@@ -244,7 +277,6 @@ public class Battle extends JPanel
 		return Math.sqrt(2 * Math.PI * n) * Math.pow(n / Math.E, n);
 	}
 	
-
 	private static double lowerIncompleteGamma(double n, double x) 
 	{
 		double s = 0;

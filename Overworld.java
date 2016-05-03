@@ -15,8 +15,8 @@ import info.gridworld.grid.Location;
 import info.gridworld.world.World;
 import java.awt.Color;
 import java.awt.Container;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,8 +34,8 @@ public class Overworld extends World<Actor>
 		KEY_DIRECTION.put("D", Location.EAST);
 	} 
 	
-	private Actor player;
-	private Actor staircase;
+	private Player player;
+	private Staircase staircase;
 	private Container overworldPane;
 	private int floorNumber;
 	
@@ -55,14 +55,44 @@ public class Overworld extends World<Actor>
 	 * Takes a reference to the overworld in which this
 	 * floor is located. It also stores the current contentPane which
 	 * is necessary to return to the overworld from battles.
-	 * @param overworld - the Overworld object that contains this Overworld.
+	 * @param overworld - the GameViewer object that contains this Overworld.
 	 */
 	public Overworld()
 	{
 		super();
 		this.overworldPane = getContentPane();
 		this.floorNumber = 0;
-		nextFloor();
+		tutorialFloor();
+	}
+	
+	/**
+	 * Sets the window title to the game title and floor number
+	 * creates the predefined tutorial grid, populates it with 
+	 * all game Actors, then masks all spaces of the board except 
+	 * the user.
+	 */
+	private void tutorialFloor()
+	{
+		setGrid(new BoundedGrid<Actor>(SIDE_LENGTH, SIDE_LENGTH));
+		int r = SIDE_LENGTH/2;
+		for (int c = 0; c < SIDE_LENGTH; c++) 
+		{
+			new Rock().putSelfInGrid(getGrid(), new Location(r - 1, c));
+			new Rock().putSelfInGrid(getGrid(), new Location(r + 1, c));
+		}
+		staircase = new Staircase();
+		staircase.putSelfInGrid(getGrid(), new Location(r, SIDE_LENGTH - 1));
+		
+		for (int c = 2; c < SIDE_LENGTH - 1; c+= 2)
+			new Enemy(EnemyType.TUTORIAL, 5).putSelfInGrid(getGrid(), new Location(r, c));
+		
+		mask();
+		player = new Player();
+		player.putSelfInGrid(getGrid(), new Location(r, 0));
+		unmask(player.getLocation());
+		floorNumber++;
+		show();
+		getWorldFrame().setTitle("Randomness of Fungus - Overworld " + floorNumber);
 	}
 	
 	/**
@@ -80,7 +110,7 @@ public class Overworld extends World<Actor>
 		
 		int enemyNumber = 5;
 		for(int x = 0; x < enemyNumber; x++)
-			new Enemy().putSelfInGrid(getGrid(), getRandomEmptyLocation());
+			new Enemy(EnemyType.TEST_ENEMY, 5).putSelfInGrid(getGrid(), getRandomEmptyLocation());
 		
 		Location playerLoc = getRandomEmptyLocation();
 		mask();
@@ -90,16 +120,7 @@ public class Overworld extends World<Actor>
 		unmask(player.getLocation());
 		floorNumber++;
 		show();
-		getWorldFrame().setTitle("Randomness of Fungus - Floor " + floorNumber);
-	}
-	
-	/**
-	 * Returns the current floor number.
-	 * @return the current floor number.
-	 */
-	public int getFloorNumber()
-	{
-		return floorNumber;
+		getWorldFrame().setTitle("Randomness of Fungus - Overworld " + floorNumber);
 	}
 	
 	/**
@@ -131,10 +152,10 @@ public class Overworld extends World<Actor>
 		repaint();
 	}
 	
-	private void doBattle()
+	private void doBattle(Enemy enemy, int turns)
 	{
 		this.overworldPane = getContentPane();
-		Battle battle = new Battle(this);
+		Battle battle = new Battle(this, enemy, turns);
 		setContentPane(battle);
 		battle.requestFocusInWindow();
 		validate();
@@ -167,12 +188,12 @@ public class Overworld extends World<Actor>
 		int randCol = (int) (Math.random()*getGrid().getNumCols());
 		getGrid().remove(new Location(randRow, randCol));
 		
-		List<Location> walls = new LinkedList<>();
+		List<Location> walls = new ArrayList<>();
 		walls.addAll(getPrimNeighbours(new Location(randRow, randCol)));
 		while(!walls.isEmpty())
 		{
 			Location randomFrontier = walls.remove((int) (Math.random()*walls.size()));
-			List<Location> freeNeighbours = new LinkedList<>();
+			List<Location> freeNeighbours = new ArrayList<>();
 			for(Location loc : getPrimNeighbours(randomFrontier))
 				if(getGrid().get(loc) == null)
 					freeNeighbours.add(loc);
@@ -197,7 +218,7 @@ public class Overworld extends World<Actor>
 	 */
 	private List<Location> getPrimNeighbours(Location loc)
 	{
-		List<Location> ret = new LinkedList<>();
+		List<Location> ret = new ArrayList<>();
 		for(int dr = -2; dr <= 2; dr += 2)
 			for(int dc = -2; dc <= 2; dc += 2)
 				if(dr == 0 ^ dc == 0)
@@ -229,7 +250,7 @@ public class Overworld extends World<Actor>
 		{
 			Actor destination = getGrid().get(pot);
 			if(destination instanceof Enemy)
-				doBattle();
+				doBattle((Enemy) destination, 5);
 			
 			if(destination == null || destination instanceof Enemy) 
 			{
