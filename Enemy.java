@@ -33,7 +33,7 @@ public class Enemy extends Actor{
 		setColor(ENEMY_COLOR);
 	}
 	
-	public EnemyType getEnemyType() {
+	public EnemyType getType() {
 		return type;
 	}
 	

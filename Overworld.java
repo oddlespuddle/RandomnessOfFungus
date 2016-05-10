@@ -29,9 +29,13 @@ public class Overworld extends World<Actor>
 	{
 		KEY_DIRECTION = new HashMap<>();
 		KEY_DIRECTION.put("W", Location.NORTH);
+		KEY_DIRECTION.put("UP", Location.NORTH);
 		KEY_DIRECTION.put("A", Location.WEST);
+		KEY_DIRECTION.put("LEFT", Location.WEST);
 		KEY_DIRECTION.put("S", Location.SOUTH);
+		KEY_DIRECTION.put("DOWN", Location.SOUTH);
 		KEY_DIRECTION.put("D", Location.EAST);
+		KEY_DIRECTION.put("RIGHT", Location.EAST);
 	} 
 	
 	private Player player;
@@ -84,7 +88,7 @@ public class Overworld extends World<Actor>
 		staircase.putSelfInGrid(getGrid(), new Location(r, SIDE_LENGTH - 1));
 		
 		for (int c = 2; c < SIDE_LENGTH - 1; c+= 2)
-			new Enemy(EnemyType.RICK_ASTLEY, 5).putSelfInGrid(getGrid(), new Location(r, c));
+			new Enemy(EnemyType.getRandomEnemyType(), 5).putSelfInGrid(getGrid(), new Location(r, c));
 		
 		//~ mask();
 		player = new Player();
@@ -110,7 +114,7 @@ public class Overworld extends World<Actor>
 		
 		int enemyNumber = 5;
 		for(int x = 0; x < enemyNumber; x++)
-			new Enemy(EnemyType.RICK_ASTLEY, 5).putSelfInGrid(getGrid(), getRandomEmptyLocation());
+			new Enemy(EnemyType.getRandomEnemyType(), 5).putSelfInGrid(getGrid(), getRandomEmptyLocation());
 		
 		Location playerLoc = getRandomEmptyLocation();
 		mask();

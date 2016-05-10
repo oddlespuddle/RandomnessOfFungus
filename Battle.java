@@ -13,20 +13,12 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.Image;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import javax.imageio.ImageIO;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
@@ -54,7 +46,7 @@ public class Battle extends JPanel
 		this.floor = floor;
 		this.enemy = enemy;
 		turnsLeft = turns;
-		clip = themeClip(enemy.getEnemyType().getMusicPath());
+		clip = enemy.getType().getMusic();
 		addComponents();
 		takeInput();
 	}
@@ -74,10 +66,10 @@ public class Battle extends JPanel
 		c.weighty = 1.0;
 		c.fill = GridBagConstraints.BOTH;
 		
-		this.add(centeredTextBox(enemy.getEnemyType().getText(), Color.GRAY), c);
+		this.add(centeredTextBox(enemy.getType().getText(), Color.GRAY), c);
 		c.gridy++;
 		
-		this.add(pictureLabel(enemy.getEnemyType().getSpritePath()), c);
+		this.add(enemy.getType().getSprite(), c);
 		c.gridy++;
 
 		this.add(centeredTextBox("Options:", Color.GRAY), c);
@@ -155,60 +147,6 @@ public class Battle extends JPanel
 		ret.setFocusable(false);
 		ret.setBackground(background);
 		return ret;
-	}
-	
-	/**
-	 * Returns a JLabel containing the image contained in the file
-	 * with the given file name.
-	 * @param fileName - the name of the image file to be encapsulated.
-	 * @return a JLabel containing the given image.
-	 */
-	private static JLabel pictureLabel(String fileName)
-	{
-		try
-		{
-			ImageIcon imgIcon = new ImageIcon(ImageIO.read(new FileInputStream(fileName)));
-			imgIcon = new ImageIcon(imgIcon.getImage().getScaledInstance(500, 400, Image.SCALE_AREA_AVERAGING));
-			return new JLabel(imgIcon);
-		}
-		catch(IOException ioe)
-		{
-			System.err.println("Missing file: " + fileName);
-			return new JLabel();
-		}
-	}
-
-	/**
-	 * Returns a Clip object corresponding to a given WAV file, handling
-	 * exceptions as necessary.
-	 * @param fileName - the name of a WAV file.
-	 * @return a Clip object corresponding to a given WAV file, or null
-	 *         if exceptions prevent the file from being created.
-	 */
-	private static Clip themeClip(String fileName)
-	{
-		try
-		{
-			File soundFile = new File(fileName);
-			AudioSystem.getAudioInputStream(soundFile);
-			AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundFile);
-			Clip ret = AudioSystem.getClip(null);
-			ret.open(audioIn);
-			return ret;
-		}
-		catch(IOException e)
-		{
-			System.err.println("Missing file: " + fileName);
-		}
-		catch(UnsupportedAudioFileException uafe)
-		{
-			System.err.println("Unsupported Audio File: " + fileName);
-		}
-		catch(LineUnavailableException lue)
-		{
-			System.err.println("Unavailable line for: " + fileName);
-		}
-		return null;
 	}
 	
 	/**
