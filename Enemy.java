@@ -20,7 +20,7 @@ public class Enemy extends Actor{
 	public Enemy()
 	{
 		super();
-		type = EnemyType.TEST_ENEMY;
+		type = EnemyType.RICK_ASTLEY;
 		turns = 5;
 		setColor(ENEMY_COLOR);
 	}

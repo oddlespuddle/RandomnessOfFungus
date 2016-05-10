@@ -1,11 +1,17 @@
 
 public enum EnemyType {
-	TEST_ENEMY("YOU ARE EXPERIENCING AN APPARITION OF RNGESUS",
-			"EnemySprites/RNGesusSprite.jpg",
-			"EnemyMusic/RickRoll.wav"),
-	TUTORIAL("I AM A TROLL",
-			"EnemySprites/TrollGuyCover.jpg",
-			"EnemyMusic/trollsong.wav");
+	RNGESUS("YOU ARE EXPERIENCING AN APPARITION OF RNGESUS",
+			"EnemySprites/RNGesus.jpg",
+			"EnemyMusic/RNGesus.wav"),
+	TROLL("I AM A TROLL",
+			"EnemySprites/Troll.jpg",
+			"EnemyMusic/Troll.wav"),
+	RICK_ASTLEY("NEVER GONNA GIVE YOU UP",
+			"EnemySprites/RickAstley.gif",
+			"EnemyMusic/RickAstley.wav"),
+	NYAN_CAT("NYANNYANYANYANYANYAN",
+			"EnemySprites/NyanCat.jpg",
+			"EnemyMusic/NyanCat.wav");
 	
 	private final String text;
 	private final String spritePath;

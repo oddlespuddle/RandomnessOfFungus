@@ -84,9 +84,9 @@ public class Overworld extends World<Actor>
 		staircase.putSelfInGrid(getGrid(), new Location(r, SIDE_LENGTH - 1));
 		
 		for (int c = 2; c < SIDE_LENGTH - 1; c+= 2)
-			new Enemy(EnemyType.TUTORIAL, 5).putSelfInGrid(getGrid(), new Location(r, c));
+			new Enemy(EnemyType.RICK_ASTLEY, 5).putSelfInGrid(getGrid(), new Location(r, c));
 		
-		mask();
+		//~ mask();
 		player = new Player();
 		player.putSelfInGrid(getGrid(), new Location(r, 0));
 		unmask(player.getLocation());
@@ -110,7 +110,7 @@ public class Overworld extends World<Actor>
 		
 		int enemyNumber = 5;
 		for(int x = 0; x < enemyNumber; x++)
-			new Enemy(EnemyType.TEST_ENEMY, 5).putSelfInGrid(getGrid(), getRandomEmptyLocation());
+			new Enemy(EnemyType.RICK_ASTLEY, 5).putSelfInGrid(getGrid(), getRandomEmptyLocation());
 		
 		Location playerLoc = getRandomEmptyLocation();
 		mask();
