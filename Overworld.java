@@ -50,8 +50,8 @@ public class Overworld extends World<Actor>
 	 */
 	public static void main(String args[]) 
 	{
-		System.setProperty("info.gridworld.gui.selection" ,"hide");
-		System.setProperty("info.gridworld.gui.tooltips" ,"hide");
+		System.setProperty("info.gridworld.gui.selection", "hide");
+		System.setProperty("info.gridworld.gui.tooltips", "hide");
 		Overworld floor = new Overworld();
 	}
 
@@ -117,7 +117,7 @@ public class Overworld extends World<Actor>
 			new Enemy(EnemyType.getRandomEnemyType(), 5).putSelfInGrid(getGrid(), getRandomEmptyLocation());
 		
 		Location playerLoc = getRandomEmptyLocation();
-		mask();
+		//~ mask();
 		
 		player = new Player();
 		player.putSelfInGrid(getGrid(), playerLoc);

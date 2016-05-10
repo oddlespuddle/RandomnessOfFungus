@@ -21,11 +21,14 @@ public enum EnemyType {
 	RICK_ASTLEY("NEVER GONNA GIVE YOU UP",
 			pictureLabel("EnemySprites/RickAstley.gif"),
 			themeClip("EnemyMusic/RickAstley.wav")),
+	MUDKIPZ("SO I HERD U LIEK MUDKIPZ",
+			pictureLabel("EnemySprites/Mudkipz.jpg"),
+			themeClip("EnemyMusic/Mudkipz.wav")),
 	NYAN_CAT("NYANNYANYANYANYANYAN",
 			pictureLabel("EnemySprites/NyanCat.jpg"),
 			themeClip("EnemyMusic/NyanCat.wav"));
 	
-	public static final EnemyType[] types = {TROLL, RICK_ASTLEY, NYAN_CAT};
+	public static final EnemyType[] types = {TROLL, RICK_ASTLEY, NYAN_CAT, MUDKIPZ};
 	private final String text;
 	private final JLabel sprite;
 	private final Clip music;
