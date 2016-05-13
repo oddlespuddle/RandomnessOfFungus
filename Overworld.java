@@ -117,7 +117,7 @@ public class Overworld extends World<Actor>
 			new Enemy(EnemyType.getRandomEnemyType(), 5).putSelfInGrid(getGrid(), getRandomEmptyLocation());
 		
 		Location playerLoc = getRandomEmptyLocation();
-		//~ mask();
+		mask();
 		
 		player = new Player();
 		player.putSelfInGrid(getGrid(), playerLoc);
