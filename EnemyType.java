@@ -13,29 +13,43 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 public enum EnemyType {
 	RNGESUS("YOU ARE EXPERIENCING AN APPARITION OF RNGESUS",
+			"RNGesus angrily mumbles integers to himself",
+			"RNGesus is pleased",
 			pictureLabel("EnemySprites/RNGesus.jpg"),
 			themeClip("EnemyMusic/RNGesus.wav")),
 	TROLL("TROLLOLOL",
+			"LOLNOPE",
+			"Well played, n00b",
 			pictureLabel("EnemySprites/Troll.jpg"),
 			themeClip("EnemyMusic/Troll.wav")),
 	RICK_ASTLEY("NEVER GONNA GIVE YOU UP",
+			"NEVER GONNA WIN THIS GAME",
+			"NEVER GONNA LET YOU DOWN",
 			pictureLabel("EnemySprites/RickAstley.gif"),
 			themeClip("EnemyMusic/RickAstley.wav")),
 	MUDKIPZ("SO I HERD U LIEK MUDKIPZ",
+			"KIP! >_>",
+			"Mud!",
 			pictureLabel("EnemySprites/Mudkipz.jpg"),
 			themeClip("EnemyMusic/Mudkipz.wav")),
 	NYAN_CAT("NYANNYANYANYANYANYAN",
+			"NYANNYANYANYANYANYAN >_<",
+			"NYANNYANYANYAAAAAAAN :3",
 			pictureLabel("EnemySprites/NyanCat.jpg"),
 			themeClip("EnemyMusic/NyanCat.wav"));
 	
 	public static final EnemyType[] types = {TROLL, RICK_ASTLEY, NYAN_CAT, MUDKIPZ};
 	private final String text;
+	private final String negative;
+	private final String positive;
 	private final JLabel sprite;
 	private final Clip music;
 	
-	EnemyType(String text, JLabel sprite, Clip music)
+	EnemyType(String text, String negative, String positive, JLabel sprite, Clip music)
 	{
 		this.text = text;
+		this.negative = negative;
+		this.positive = positive;
 		this.sprite = sprite;
 		this.music = music;
 	}
@@ -47,6 +61,16 @@ public enum EnemyType {
 	public String getText()
 	{
 		return text;
+	}
+
+	public String getNegative()
+	{
+		return negative;
+	}
+
+	public String getPositive()
+	{
+		return positive;
 	}
 	
 	public JLabel getSprite() 

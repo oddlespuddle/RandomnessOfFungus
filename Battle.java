@@ -31,6 +31,7 @@ public class Battle extends JPanel
 	public static final int NUM_OPTIONS = 4;
 	private final Clip clip; 
 	private static final List<Integer> userInputs = new LinkedList<>();
+	private JTextField responseText;
 	private Overworld floor;
 	private int turnsLeft;
 	private Enemy enemy;
@@ -45,6 +46,8 @@ public class Battle extends JPanel
 		setFocusable(true);
 		this.floor = floor;
 		this.enemy = enemy;
+		this.responseText = centeredTextBox(enemy.getType().getText(), Color.GRAY);
+		this.previousPValue = 0;
 		turnsLeft = turns;
 		clip = enemy.getType().getMusic();
 		addComponents();
@@ -66,7 +69,7 @@ public class Battle extends JPanel
 		c.weighty = 1.0;
 		c.fill = GridBagConstraints.BOTH;
 		
-		this.add(centeredTextBox(enemy.getType().getText(), Color.GRAY), c);
+		this.add(responseText, c);
 		c.gridy++;
 		
 		this.add(enemy.getType().getSprite(), c);
