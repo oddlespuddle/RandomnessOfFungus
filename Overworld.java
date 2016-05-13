@@ -44,7 +44,6 @@ public class Overworld extends World<Actor>
 	private Container overworldPane;
 	private int floorNumber;
 	private boolean isBattling;
-	
 	/**
 	 * Provides creates a new overworld, initiating gameplay.
 	 * @param args - An array of command line positional arguments which
@@ -67,7 +66,7 @@ public class Overworld extends World<Actor>
 	{
 		super();
 		overworldPane = getContentPane();
-		floorNumber = 1;
+		floorNumber = 0;
 		isBattling = false;
 		tutorialFloor();
 	}
@@ -95,7 +94,13 @@ public class Overworld extends World<Actor>
 		repaint();
 	}
 	
-		/**
+	public void loseTheGame()
+	{
+		System.out.println("You just lost the game!");
+		System.exit(0);
+	}
+	
+	/**
 	 * Moves the player when the W, A, S, or D keys are pressed.
 	 * Both parameters are supplied by the GridWorld GUI.
 	 * 

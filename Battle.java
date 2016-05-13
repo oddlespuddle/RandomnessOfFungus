@@ -177,7 +177,8 @@ public class Battle extends JPanel
 			double pValue = chiSquaredUniformityTest(frequencies);
 			if (pValue <= ALPHA)
 			{
-				//player loses
+				System.out.printf("P-Value: %.6f%n", pValue);
+				floor.loseTheGame();
 			}
 		}
 	}
