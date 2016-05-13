@@ -12,7 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.Color;
 import javax.swing.Timer;
 
-public class RNGesus extends Actor{
+public class RNGesus extends Enemy{
 	public static final int DELAY = 100;
 	private final Overworld floor;
 	private Timer colorTimer;
@@ -23,9 +23,9 @@ public class RNGesus extends Actor{
 	 * to time that color changing effect.
 	 * @param floor - the floor containing this RNGesus
 	 */
-	public RNGesus(final Overworld floor)
+	public RNGesus(final Overworld floor, int turns)
 	{
-		super();
+		super(EnemyType.RNGESUS, turns);
 		this.floor = floor;
 		colorTimer = new Timer(DELAY, new ActionListener() 
 		{

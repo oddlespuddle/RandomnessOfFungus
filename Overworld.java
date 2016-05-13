@@ -23,6 +23,7 @@ import java.util.Map;
 public class Overworld extends World<Actor>
 {
 	private static final int SIDE_LENGTH = 10;
+	private static final int TUTORIAL_BATTLE_LENGTH = 5;
 	private static final Map<String, Integer> KEY_DIRECTION;
 	
 	static
@@ -42,6 +43,7 @@ public class Overworld extends World<Actor>
 	private Staircase staircase;
 	private Container overworldPane;
 	private int floorNumber;
+	private boolean isBattling;
 	
 	/**
 	 * Provides creates a new overworld, initiating gameplay.
@@ -64,9 +66,69 @@ public class Overworld extends World<Actor>
 	public Overworld()
 	{
 		super();
-		this.overworldPane = getContentPane();
-		this.floorNumber = 0;
+		overworldPane = getContentPane();
+		floorNumber = 1;
+		isBattling = false;
 		tutorialFloor();
+	}
+	
+	public void nextFloor()
+	{
+		floorNumber++;
+		if(floorNumber % 10 == 0)
+			bossFloor();
+		else
+			generalFloor();
+		show();
+	}
+	
+	/**
+	 * Resets the frame to view and focus on the overworld, as opposed
+	 * to the battle scene.
+	 */
+	public void overworldReturn()
+	{
+		isBattling = false;
+		setContentPane(overworldPane);
+		getWorldFrame().requestFocusInWindow();
+		validate();
+		repaint();
+	}
+	
+		/**
+	 * Moves the player when the W, A, S, or D keys are pressed.
+	 * Both parameters are supplied by the GridWorld GUI.
+	 * 
+	 * @param description - The string describing the key pressed 
+	 * @param loc - The selected location in the grid at the time the key was pressed
+	 * @return true if the world consumes the key press, false if the GUI should
+	 * consume it.
+	 */
+	@Override
+	public boolean keyPressed(String description, Location loc)
+	{
+		if(isBattling)
+			return false;
+		
+		Location pot = null;
+		if(KEY_DIRECTION.containsKey(description))
+			pot = player.getLocation().getAdjacentLocation(KEY_DIRECTION.get(description));
+		
+		if(pot != null && getGrid().isValid(pot))
+		{
+			Actor destination = getGrid().get(pot);
+			if(destination instanceof Enemy)
+				doBattle((Enemy) destination, 5);
+			if(destination == null || destination instanceof Enemy) 
+			{
+				player.moveTo(pot);
+				unmask(pot);
+			}
+			if(getGrid().get(pot) == staircase)
+				nextFloor();
+		}
+		
+		return pot != null;
 	}
 	
 	/**
@@ -78,7 +140,7 @@ public class Overworld extends World<Actor>
 	private void tutorialFloor()
 	{
 		setGrid(new BoundedGrid<Actor>(SIDE_LENGTH, SIDE_LENGTH));
-		int r = SIDE_LENGTH/2;
+		int r = SIDE_LENGTH / 2;
 		for (int c = 0; c < SIDE_LENGTH; c++) 
 		{
 			new Rock().putSelfInGrid(getGrid(), new Location(r - 1, c));
@@ -88,15 +150,13 @@ public class Overworld extends World<Actor>
 		staircase.putSelfInGrid(getGrid(), new Location(r, SIDE_LENGTH - 1));
 		
 		for (int c = 2; c < SIDE_LENGTH - 1; c+= 2)
-			new Enemy(EnemyType.getRandomEnemyType(), 5).putSelfInGrid(getGrid(), new Location(r, c));
+			new Enemy(EnemyType.getRandomEnemyType(), TUTORIAL_BATTLE_LENGTH).putSelfInGrid(getGrid(), new Location(r, c));
 		
-		//~ mask();
 		player = new Player();
 		player.putSelfInGrid(getGrid(), new Location(r, 0));
 		unmask(player.getLocation());
-		floorNumber++;
 		show();
-		getWorldFrame().setTitle("Randomness of Fungus - Overworld " + floorNumber);
+		getWorldFrame().setTitle("Randomness of Fungus - Tutorial Floor");
 	}
 	
 	/**
@@ -104,7 +164,7 @@ public class Overworld extends World<Actor>
 	 * creates a new grid, populates it with all game Actors, then masks
 	 * all spaces of the board except the user.
 	 */
-	public void nextFloor()
+	private void generalFloor()
 	{
 		setGrid(new BoundedGrid<Actor>(SIDE_LENGTH, SIDE_LENGTH));
 		generateMaze();
@@ -122,16 +182,39 @@ public class Overworld extends World<Actor>
 		player = new Player();
 		player.putSelfInGrid(getGrid(), playerLoc);
 		unmask(player.getLocation());
-		floorNumber++;
 		show();
-		getWorldFrame().setTitle("Randomness of Fungus - Overworld " + floorNumber);
+		getWorldFrame().setTitle("Randomness of Fungus - Floor " + floorNumber);
 	}
+	
+	private void bossFloor()
+	{
+		setGrid(new BoundedGrid<Actor>(SIDE_LENGTH, SIDE_LENGTH));
+		int r = SIDE_LENGTH / 2;
+		staircase = new Staircase();
+		staircase.putSelfInGrid(getGrid(), new Location(r, SIDE_LENGTH - 1));
+		
+		for (int c = 0; c < SIDE_LENGTH; c++) 
+		{
+			new Rock().putSelfInGrid(getGrid(), new Location(r - 1, c));
+			new Rock().putSelfInGrid(getGrid(), new Location(r + 1, c));
+		}
+		
+		new RNGesus(this, floorNumber).putSelfInGrid(getGrid(), new Location(r, SIDE_LENGTH-2));
+		staircase = new Staircase();
+		staircase.putSelfInGrid(getGrid(), new Location(r, SIDE_LENGTH - 1));
+		player = new Player();
+		player.putSelfInGrid(getGrid(), new Location(r, 0));
+
+		show();
+		getWorldFrame().setTitle("Randomness of Fungus - Boss Floor");
+	}
+	
 	
 	/**
 	 * Hides the value of all tiles by populating them with Mystery objects
 	 * containing the values that actually belong in those tiles.
 	 */
-	public void mask()
+	private void mask()
 	{
 		for(int r = 0; r < getGrid().getNumRows(); r++)
 			for(int c = 0; c < getGrid().getNumCols(); c++)
@@ -144,21 +227,10 @@ public class Overworld extends World<Actor>
 			}
 	}
 	
-	/**
-	 * Resets the frame to view and focus on the overworld, as opposed
-	 * to the battle scene.
-	 */
-	public void overworldReturn()
-	{
-		setContentPane(overworldPane);
-		getWorldFrame().requestFocusInWindow();
-		validate();
-		repaint();
-	}
-	
 	private void doBattle(Enemy enemy, int turns)
 	{
-		this.overworldPane = getContentPane();
+		overworldPane = getContentPane();
+		isBattling = true;
 		Battle battle = new Battle(this, enemy, turns);
 		setContentPane(battle);
 		battle.requestFocusInWindow();
@@ -171,7 +243,7 @@ public class Overworld extends World<Actor>
 	 * them visible to the player.
 	 * @param start - the location of the tile whose neighbors shall unbox
 	 */
-	public void unmask(Location start)
+	private void unmask(Location start)
 	{
 		for(Actor myst : getGrid().getNeighbors(start))
 			if(myst instanceof Mystery)
@@ -232,39 +304,5 @@ public class Overworld extends World<Actor>
 						ret.add(pot);
 				}
 		return ret;
-	}
-	
-	/**
-	 * Moves the player when the W, A, S, or D keys are pressed.
-	 * Both parameters are supplied by the GridWorld GUI.
-	 * 
-	 * @param description - The string describing the key pressed 
-	 * @param loc - The selected location in the grid at the time the key was pressed
-	 * @return true if the world consumes the key press, false if the GUI should
-	 * consume it.
-	 */
-	@Override
-	public boolean keyPressed(String description, Location loc)
-	{
-		Location pot = null;
-		if(KEY_DIRECTION.containsKey(description))
-			pot = player.getLocation().getAdjacentLocation(KEY_DIRECTION.get(description));
-		
-		if(pot != null && getGrid().isValid(pot))
-		{
-			Actor destination = getGrid().get(pot);
-			if(destination instanceof Enemy)
-				doBattle((Enemy) destination, 5);
-			
-			if(destination == null || destination instanceof Enemy) 
-			{
-				player.moveTo(pot);
-				unmask(pot);
-			}
-			if(getGrid().get(pot) == staircase)
-				nextFloor();
-		}
-		
-		return pot != null;
 	}
 }
