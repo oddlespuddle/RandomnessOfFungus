@@ -34,6 +34,7 @@ public class Battle extends JPanel
 	private JTextField responseText;
 	private Overworld floor;
 	private int turnsLeft;
+	private double prevPValue;
 	private Enemy enemy;
 
 	/**
@@ -47,7 +48,7 @@ public class Battle extends JPanel
 		this.floor = floor;
 		this.enemy = enemy;
 		this.responseText = centeredTextBox(enemy.getType().getText(), Color.GRAY);
-		this.previousPValue = 0;
+		this.prevPValue = 0;
 		turnsLeft = turns;
 		clip = enemy.getType().getMusic();
 		addComponents();
@@ -117,7 +118,13 @@ public class Battle extends JPanel
 	private void takeTurn(int input)
 	{
 		userInputs.add(input);
-		testForRandomness();
+		double newPValue = testForRandomness();
+		if(newPValue >= prevPValue)
+			responseText.setText(enemy.getType().getPositive());
+		else
+			responseText.setText(enemy.getType().getNegative());
+		prevPValue = newPValue;
+		repaint();
 		if (--turnsLeft == 0)
 			overworldReturn();
 	}
@@ -156,34 +163,32 @@ public class Battle extends JPanel
 	 * Tests the randomness of the input history of the player and causes the 
 	 * player to lose if the results do not meet the randomness threshold.
 	 */
-	private void testForRandomness()
+	private double testForRandomness()
 	{
 		int maxGroupSize = (int) (Math.log(userInputs.size() / 5.0) / Math.log(NUM_OPTIONS));
+		double maxPValue = 0;
 		for (int groupSize = 1; groupSize <= maxGroupSize; groupSize++) 
 		{
 			int numGroups = (int) Math.pow(NUM_OPTIONS, groupSize);
-			
-			if (userInputs.size() % groupSize != 0)
-				continue;
-			
-			Iterator<Integer> it = userInputs.iterator();
-			int[] frequencies = new int[numGroups];
-			while (it.hasNext()) {
-				int n = 0;
-				for (int j = 0; j < groupSize; j++) 
-				{
-					n *= 4;
-					n += it.next();
-				}
-				frequencies[n]++;
-			}
-			double pValue = chiSquaredUniformityTest(frequencies);
-			if (pValue <= ALPHA)
+			if (userInputs.size() % groupSize == 0)
 			{
-				System.out.printf("P-Value: %.6f%n", pValue);
-				floor.loseTheGame();
+				Iterator<Integer> it = userInputs.iterator();
+				int[] frequencies = new int[numGroups];
+				while (it.hasNext()) 
+				{
+					int n = 0;
+					for (int j = 0; j < groupSize; j++) 
+						n  = n*4 + it.next();
+					frequencies[n]++;
+				}
+				double pValue = chiSquaredUniformityTest(frequencies);
+				if (pValue > maxPValue)
+					maxPValue = pValue;
+				if (pValue <= ALPHA)
+					floor.loseTheGame();
 			}
 		}
+		return maxPValue;
 	}
 
 	/**
