@@ -13,10 +13,13 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Scanner;
 import javax.imageio.ImageIO;
 import javax.sound.sampled.Clip;
 import javax.swing.ImageIcon;
@@ -29,13 +32,32 @@ public class Battle extends JPanel
 {
 	public static final double ALPHA = .05;
 	public static final int NUM_OPTIONS = 4;
-	private final Clip clip; 
+	public static final String[] moveOptions;
+	public static final String WORD_BANK = "WordBank.txt";
 	private static final List<Integer> userInputs = new LinkedList<>();
+	private final Clip clip;
 	private JTextField responseText;
 	private Overworld floor;
 	private int turnsLeft;
 	private double prevPValue;
 	private Enemy enemy;
+
+	static
+	{
+		String[] moveArray = new String[] {"Bait", "Rock", "Ball", "Panic"};
+		try
+		{
+			moveArray = new Scanner(new File(WORD_BANK)).useDelimiter("\\Z").next().split("\n");
+		}
+		catch(IOException e)
+		{
+			System.err.println("Missing file: " + WORD_BANK);
+		}
+		finally
+		{
+			moveOptions = moveArray;
+		}
+	}
 
 	/**
 	 * Stores a reference to the floor whose GUI must be returned to after
@@ -80,10 +102,15 @@ public class Battle extends JPanel
 		c.gridy++;
 		
 		JPanel options = new JPanel(new GridLayout(2, 2));
-		for(int gridx = 0; gridx < 4; gridx++)
-			options.add(centeredTextBox(""+gridx, Color.GRAY));
+		for(int gridx = 1; gridx <= 4; gridx++)
+			options.add(centeredTextBox(String.format("%d: %s", gridx, getRandomMove()), Color.GRAY));
 		
 		this.add(options, c);
+	}
+	
+	private String getRandomMove()
+	{
+		return moveOptions[(int) (Math.random()*moveOptions.length)];
 	}
 	
 	/**

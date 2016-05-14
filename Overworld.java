@@ -236,7 +236,16 @@ public class Overworld extends World<Actor>
 	{
 		overworldPane = getContentPane();
 		isBattling = true;
-		Battle battle = new Battle(this, enemy, turns);
+		
+		int numTurns;
+		if(floorNumber == 0)
+			numTurns = 5;
+		else if(floorNumber % 10 == 0)
+			numTurns = floorNumber;
+		else
+			numTurns = (int) Math.round(Math.log(floorNumber)) + 1;
+		
+		Battle battle = new Battle(this, enemy, numTurns);
 		setContentPane(battle);
 		battle.requestFocusInWindow();
 		validate();
