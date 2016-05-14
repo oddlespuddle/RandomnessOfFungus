@@ -30,7 +30,6 @@ import javax.swing.JTextField;
 
 public class Battle extends JPanel
 {
-	public static final double ALPHA = .05;
 	public static final int NUM_OPTIONS = 4;
 	public static final String[] moveOptions;
 	public static final String WORD_BANK = "WordBank.txt";
@@ -40,6 +39,7 @@ public class Battle extends JPanel
 	private Overworld floor;
 	private int turnsLeft;
 	private double prevPValue;
+	private double alpha;
 	private Enemy enemy;
 
 	static
@@ -64,13 +64,14 @@ public class Battle extends JPanel
 	 * this battle, adds scenery and music, and responds to user input.
 	 * @param floor - the floor to which the GUI must return.
 	 */
-	public Battle(Overworld floor, Enemy enemy, int turns)
+	public Battle(Overworld floor, Enemy enemy, int turns, double alphaBoost)
 	{
 		setFocusable(true);
 		this.floor = floor;
 		this.enemy = enemy;
 		this.responseText = centeredTextBox(enemy.getType().getText(), Color.GRAY);
 		this.prevPValue = 0;
+		this.alpha = 0.5 + alphaBoost;
 		turnsLeft = turns;
 		clip = enemy.getType().getMusic();
 		addComponents();
@@ -211,7 +212,7 @@ public class Battle extends JPanel
 				double pValue = chiSquaredUniformityTest(frequencies);
 				if (pValue > maxPValue)
 					maxPValue = pValue;
-				if (pValue <= ALPHA)
+				if (pValue <= alpha)
 					floor.loseTheGame();
 			}
 		}

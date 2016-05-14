@@ -17,8 +17,10 @@ import java.awt.Color;
 import java.awt.Container;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Overworld extends World<Actor>
 {
@@ -40,10 +42,13 @@ public class Overworld extends World<Actor>
 	} 
 	
 	private Player player;
-	private Staircase staircase;
 	private Container overworldPane;
 	private int floorNumber;
+	private int lootGained;
 	private boolean isBattling;
+	private boolean isCursed;
+	private Set<Location> lootSpots;
+	
 	/**
 	 * Provides creates a new overworld, initiating gameplay.
 	 * @param args - An array of command line positional arguments which
@@ -67,7 +72,9 @@ public class Overworld extends World<Actor>
 		super();
 		overworldPane = getContentPane();
 		floorNumber = 0;
+		lootGained = 0;
 		isBattling = false;
+		isCursed = false;
 		tutorialFloor();
 	}
 	
@@ -112,28 +119,23 @@ public class Overworld extends World<Actor>
 	@Override
 	public boolean keyPressed(String description, Location loc)
 	{
-		if(isBattling)
-			return false;
-		
-		Location pot = null;
-		if(KEY_DIRECTION.containsKey(description))
-			pot = player.getLocation().getAdjacentLocation(KEY_DIRECTION.get(description));
-		
-		if(pot != null && getGrid().isValid(pot))
+		if(!isBattling && KEY_DIRECTION.containsKey(description))
 		{
-			Actor destination = getGrid().get(pot);
-			if(destination instanceof Enemy)
-				doBattle((Enemy) destination, 5);
-			if(destination == null || destination instanceof Enemy) 
+			Location pot = player.getLocation().getAdjacentLocation(KEY_DIRECTION.get(description));
+			if(pot != null && getGrid().isValid(pot))
 			{
-				player.moveTo(pot);
-				unmask(pot);
+				Actor destination = getGrid().get(pot);
+				if(destination instanceof Enemy)
+					doBattle((Enemy) destination, 5);
+				if(destination == null || destination instanceof Enemy) 
+					player.moveTo(unmask(pot));
+				if(lootSpots != null && lootSpots.contains(pot))
+					determineLoot();
+				if(destination instanceof Staircase)
+					nextFloor();
 			}
-			if(getGrid().get(pot) == staircase)
-				nextFloor();
 		}
-		
-		return pot != null;
+		return true;
 	}
 	
 	/**
@@ -151,10 +153,9 @@ public class Overworld extends World<Actor>
 			new Rock().putSelfInGrid(getGrid(), new Location(r - 1, c));
 			new Rock().putSelfInGrid(getGrid(), new Location(r + 1, c));
 		}
-		staircase = new Staircase();
-		staircase.putSelfInGrid(getGrid(), new Location(r, SIDE_LENGTH - 1));
+		new Staircase().putSelfInGrid(getGrid(), new Location(r, SIDE_LENGTH - 1));
 		
-		for (int c = 2; c < SIDE_LENGTH - 1; c+= 2)
+		for (int c = 2; c < SIDE_LENGTH - 1; c += 2)
 			new Enemy(EnemyType.getRandomEnemyType(), TUTORIAL_BATTLE_LENGTH).putSelfInGrid(getGrid(), new Location(r, c));
 		
 		player = new Player();
@@ -162,6 +163,7 @@ public class Overworld extends World<Actor>
 		unmask(player.getLocation());
 		show();
 		getWorldFrame().setTitle("Randomness of Fungus - Tutorial Floor");
+		//~ setCursed(true);
 	}
 	
 	/**
@@ -173,15 +175,14 @@ public class Overworld extends World<Actor>
 	{
 		setGrid(new BoundedGrid<Actor>(SIDE_LENGTH, SIDE_LENGTH));
 		generateMaze();
-		
-		staircase = new Staircase();
-		staircase.putSelfInGrid(getGrid(), getRandomEmptyLocation());
+		new Staircase().putSelfInGrid(getGrid(), getRandomEmptyLocation());
 		
 		int enemyNumber = 5;
 		for(int x = 0; x < enemyNumber; x++)
 			new Enemy(EnemyType.getRandomEnemyType(), 5).putSelfInGrid(getGrid(), getRandomEmptyLocation());
 		
 		Location playerLoc = getRandomEmptyLocation();
+		lootSpots = pickLootSpots();
 		mask();
 		
 		player = new Player();
@@ -195,8 +196,7 @@ public class Overworld extends World<Actor>
 	{
 		setGrid(new BoundedGrid<Actor>(SIDE_LENGTH, SIDE_LENGTH));
 		int r = SIDE_LENGTH / 2;
-		staircase = new Staircase();
-		staircase.putSelfInGrid(getGrid(), new Location(r, SIDE_LENGTH - 1));
+		new Staircase().putSelfInGrid(getGrid(), new Location(r, SIDE_LENGTH - 1));
 		
 		for (int c = 0; c < SIDE_LENGTH; c++) 
 		{
@@ -205,15 +205,12 @@ public class Overworld extends World<Actor>
 		}
 		
 		new RNGesus(this, floorNumber).putSelfInGrid(getGrid(), new Location(r, SIDE_LENGTH-2));
-		staircase = new Staircase();
-		staircase.putSelfInGrid(getGrid(), new Location(r, SIDE_LENGTH - 1));
 		player = new Player();
 		player.putSelfInGrid(getGrid(), new Location(r, 0));
 
 		show();
 		getWorldFrame().setTitle("Randomness of Fungus - Boss Floor");
 	}
-	
 	
 	/**
 	 * Hides the value of all tiles by populating them with Mystery objects
@@ -245,23 +242,47 @@ public class Overworld extends World<Actor>
 		else
 			numTurns = (int) Math.round(Math.log(floorNumber)) + 1;
 		
-		Battle battle = new Battle(this, enemy, numTurns);
+		double alphaCurse = 0;
+		if(isCursed)
+			alphaCurse = 0.5 + 0.5 * Math.sin(floorNumber * Math.PI);
+		
+		Battle battle = new Battle(this, enemy, numTurns, alphaCurse);
 		setContentPane(battle);
 		battle.requestFocusInWindow();
 		validate();
 		repaint();
 	}
 	
+	private void determineLoot()
+	{
+		if(Math.random() < .05)
+		{
+			isCursed = true;
+			setCursed(true);
+		}
+		else if(isCursed)
+		{
+			isCursed = false;
+			setCursed(false);
+		}
+		else
+		{
+			lootGained++;
+		}
+	}
+	
 	/**
 	 * Unboxes all Mystery objects adjacent to a given location, making 
-	 * them visible to the player.
+	 * them visible to the player and return the starting point.
 	 * @param start - the location of the tile whose neighbors shall unbox
+	 * @return the given location
 	 */
-	private void unmask(Location start)
+	private Location unmask(Location start)
 	{
 		for(Actor myst : getGrid().getNeighbors(start))
 			if(myst instanceof Mystery)
 				((Mystery) myst).reveal();
+		return start;
 	}
 	
 	/**
@@ -317,6 +338,15 @@ public class Overworld extends World<Actor>
 					if(getGrid().isValid(pot))
 						ret.add(pot);
 				}
+		return ret;
+	}
+
+	private Set<Location> pickLootSpots()
+	{
+		Set<Location> ret = new HashSet<Location>();
+		if(getGrid() != null)
+			for(int x = 0; x < 5; x++)
+				ret.add(getRandomEmptyLocation());
 		return ret;
 	}
 }

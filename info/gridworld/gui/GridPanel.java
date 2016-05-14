@@ -37,10 +37,13 @@ import java.awt.event.MouseEvent;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
 import java.awt.geom.Rectangle2D;
+import java.io.File;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.JToolTip;
 import javax.swing.JViewport;
@@ -70,6 +73,7 @@ public class GridPanel extends JPanel implements Scrollable,
     private int numRows, numCols, originRow, originCol;
     private int cellSize; // the size of each cell, EXCLUDING the gridlines
     private boolean toolTipsEnabled;
+    private boolean isCursed;
     private Color backgroundColor = Color.WHITE;
     private ResourceBundle resources;
     private DisplayMap displayMap;
@@ -87,6 +91,7 @@ public class GridPanel extends JPanel implements Scrollable,
         displayMap = map;
         resources = res;
         setToolTipsEnabled(true);
+        isCursed = false;
     }
 
     /**
@@ -101,16 +106,37 @@ public class GridPanel extends JPanel implements Scrollable,
         if (grid == null)
             return;
 
-        Insets insets = getInsets();
-        g2.setColor(backgroundColor); 
-        g2.fillRect(insets.left, insets.top, numCols * (cellSize + 1) + 1, numRows
-                * (cellSize + 1) + 1);
-
-        drawWatermark(g2);
-        drawGridlines(g2);
-        drawOccupants(g2);
-        drawCurrentLocation(g2);
+        boolean bgFail = false;
+        if(isCursed)
+        {
+			try
+			{
+				g2.drawImage(ImageIO.read(new File("CursedBackground.jpg")), 0, 0, 500, 500, null);
+			}
+			catch(IOException ioe)
+			{
+				System.err.println("Missing file: " + "CursedBackground.jpg");
+				bgFail = true;
+			}
+		}
+		if(!isCursed || bgFail)
+		{
+			Insets insets = getInsets();
+			g2.setColor(backgroundColor); 
+			g2.fillRect(insets.left, insets.top, numCols * (cellSize + 1) + 1, numRows
+					* (cellSize + 1) + 1);
+		}
+		drawWatermark(g2);
+		drawGridlines(g2);
+		drawOccupants(g2);
+		drawCurrentLocation(g2);
     }
+
+	public void setCursed(boolean isCursed)
+	{
+		this.isCursed = isCursed;
+		repaint();
+	}
 
     /**
      * Draw one occupant object. First verify that the object is actually

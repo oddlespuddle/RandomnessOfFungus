@@ -214,6 +214,12 @@ public class WorldFrame<T> extends JFrame
         super.repaint();
     }
 
+	public void setCursed(boolean isCursed)
+	{
+		display.setCursed(isCursed);
+		repaint();
+	}
+
     /**
      * Gets the world that this frame displays
      * @return the world

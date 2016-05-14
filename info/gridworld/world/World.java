@@ -85,6 +85,12 @@ public class World<T>
 		}
     }
 
+	public void setCursed(boolean isCursed)
+	{
+		frame.setCursed(isCursed);
+		show();
+	}
+
     /**
      * Gets the grid managed by this world.
      * @return the grid
