@@ -189,7 +189,7 @@ public class Overworld extends World<Actor>
 		player.putSelfInGrid(getGrid(), playerLoc);
 		unmask(player.getLocation());
 		show();
-		getWorldFrame().setTitle("Randomness of Fungus - Floor " + floorNumber);
+		getWorldFrame().setTitle("Randomness of Fungus - Floor " + floorNumber + " (" + lootGained + ")");
 	}
 	
 	private void bossFloor()
@@ -255,7 +255,7 @@ public class Overworld extends World<Actor>
 	
 	private void determineLoot()
 	{
-		if(Math.random() < .05)
+		if(Math.random() < .2)
 		{
 			isCursed = true;
 			setCursed(true);
@@ -268,6 +268,7 @@ public class Overworld extends World<Actor>
 		else
 		{
 			lootGained++;
+			getWorldFrame().setTitle("Randomness of Fungus - Floor " + floorNumber + " (" + lootGained + ")");
 		}
 	}
 	
