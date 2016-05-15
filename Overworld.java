@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.JScrollPane;
+
 public class Overworld extends World<Actor>
 {
 	private static final int SIDE_LENGTH = 10;
@@ -119,7 +121,7 @@ public class Overworld extends World<Actor>
 		getWorldFrame().setTitle("You just lost the game!");
 		HistogramComponent histogram = new HistogramComponent(frequencies);
 		isBattling = true;
-		setContentPane(histogram);
+		setContentPane(new JScrollPane(histogram));
 		histogram.requestFocusInWindow();
 		validate();
 		repaint();
