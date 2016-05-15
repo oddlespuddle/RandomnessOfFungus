@@ -4,7 +4,7 @@
  * when necessary.
  * @author Alexander Wong and Jiaming Chen
  * Period: 2
- * Date: 2016-04-30 (ISO)
+ * Date: 2016-05-14 (ISO)
  */
 
 import info.gridworld.actor.Actor;
@@ -26,6 +26,13 @@ public class Overworld extends World<Actor>
 {
 	private static final int SIDE_LENGTH = 10;
 	private static final int TUTORIAL_BATTLE_LENGTH = 5;
+	private static final int BOSS_FLOOR_MOD = 10;
+	private static final int MID_ROW = SIDE_LENGTH / 2;
+	private static final int NUM_ENEMIES = 5;
+	private static final int NUM_LOOT = 5;
+	private static final double MID_ALPHA = 0.5;
+	private static final double AMPLITUDE = 0.5;
+	private static final double CURSE_PROBABILITY = 0.2;
 	private static final Map<String, Integer> KEY_DIRECTION;
 	
 	static
@@ -51,6 +58,7 @@ public class Overworld extends World<Actor>
 	
 	/**
 	 * Provides creates a new overworld, initiating gameplay.
+	 * Hides gui selection and tooltips because they are unnecessary.
 	 * @param args - An array of command line positional arguments which
 	 * is conventionally required but in this case unusued.
 	 */
@@ -62,10 +70,8 @@ public class Overworld extends World<Actor>
 	}
 
 	/**
-	 * Takes a reference to the overworld in which this
-	 * floor is located. It also stores the current contentPane which
-	 * is necessary to return to the overworld from battles.
-	 * @param overworld - the GameViewer object that contains this Overworld.
+	 * Stores the current contentPane, sets the floor number and loot to
+	 * 0, sets isBattline and isCursed to false, and begins the tutorial.
 	 */
 	public Overworld()
 	{
@@ -78,10 +84,14 @@ public class Overworld extends World<Actor>
 		tutorialFloor();
 	}
 	
+	/**
+	 * Advances to the next floor, increasing the floor number.
+	 * Brings the player to a boss floor every 10th floor.
+	 */
 	public void nextFloor()
 	{
 		floorNumber++;
-		if(floorNumber % 10 == 0)
+		if(floorNumber % BOSS_FLOOR_MOD == 0)
 			bossFloor();
 		else
 			generalFloor();
@@ -101,6 +111,9 @@ public class Overworld extends World<Actor>
 		repaint();
 	}
 	
+	/**
+	 * Ends the game
+	 */
 	public void loseTheGame()
 	{
 		System.out.println("You just lost the game!");
@@ -108,8 +121,9 @@ public class Overworld extends World<Actor>
 	}
 	
 	/**
-	 * Moves the player when the W, A, S, or D keys are pressed.
-	 * Both parameters are supplied by the GridWorld GUI.
+	 * Moves the player when the W, A, S, D, or arrow keys are pressed,
+	 * starting battles, advancing floors, cursing, looting, and unmasking
+	 * as necessary. Both parameters are supplied by the GridWorld GUI.
 	 * 
 	 * @param description - The string describing the key pressed 
 	 * @param loc - The selected location in the grid at the time the key was pressed
@@ -121,16 +135,17 @@ public class Overworld extends World<Actor>
 	{
 		if(!isBattling && KEY_DIRECTION.containsKey(description))
 		{
-			Location pot = player.getLocation().getAdjacentLocation(KEY_DIRECTION.get(description));
+			Location pot = player.getLocation().getAdjacentLocation(
+				KEY_DIRECTION.get(description));
 			if(pot != null && getGrid().isValid(pot))
 			{
 				Actor destination = getGrid().get(pot);
 				if(destination instanceof Enemy)
-					doBattle((Enemy) destination, 5);
+					doBattle((Enemy) destination);
 				if(destination == null || destination instanceof Enemy) 
 					player.moveTo(unmask(pot));
 				if(lootSpots != null && lootSpots.contains(pot))
-					determineLoot();
+					determineLoot(pot);
 				if(destination instanceof Staircase)
 					nextFloor();
 			}
@@ -139,37 +154,36 @@ public class Overworld extends World<Actor>
 	}
 	
 	/**
-	 * Sets the window title to the game title and floor number
-	 * creates the predefined tutorial grid, populates it with 
-	 * all game Actors, then masks all spaces of the board except 
-	 * the user.
+	 * Sets the window title to the game title and "Tutorial Floor,"
+	 * and places rocks, enemies, a staircase, and the player appropriately.
 	 */
 	private void tutorialFloor()
 	{
 		setGrid(new BoundedGrid<Actor>(SIDE_LENGTH, SIDE_LENGTH));
-		int r = SIDE_LENGTH / 2;
-		for (int c = 0; c < SIDE_LENGTH; c++) 
+		for (int col = 0; col < SIDE_LENGTH; col++) 
 		{
-			new Rock().putSelfInGrid(getGrid(), new Location(r - 1, c));
-			new Rock().putSelfInGrid(getGrid(), new Location(r + 1, c));
+			new Rock().putSelfInGrid(getGrid(), new Location(MID_ROW - 1, col));
+			new Rock().putSelfInGrid(getGrid(), new Location(MID_ROW + 1, col));
 		}
-		new Staircase().putSelfInGrid(getGrid(), new Location(r, SIDE_LENGTH - 1));
 		
-		for (int c = 2; c < SIDE_LENGTH - 1; c += 2)
-			new Enemy(EnemyType.getRandomEnemyType(), TUTORIAL_BATTLE_LENGTH).putSelfInGrid(getGrid(), new Location(r, c));
+		new Staircase().putSelfInGrid(getGrid(), 
+			new Location(MID_ROW, SIDE_LENGTH - 1));
+		
+		for (int col = 2; col < SIDE_LENGTH; col += 2)
+			new Enemy(EnemyType.getRandomEnemyType())
+				.putSelfInGrid(getGrid(), new Location(MID_ROW, col));
 		
 		player = new Player();
-		player.putSelfInGrid(getGrid(), new Location(r, 0));
+		player.putSelfInGrid(getGrid(), new Location(MID_ROW, 0));
 		unmask(player.getLocation());
 		show();
 		getWorldFrame().setTitle("Randomness of Fungus - Tutorial Floor");
-		//~ setCursed(true);
 	}
 	
 	/**
-	 * Sets the window title to the game title and floor number
-	 * creates a new grid, populates it with all game Actors, then masks
-	 * all spaces of the board except the user.
+	 * Sets the window title to the game title and information aboue the
+	 * floor. Places rocks, enemies, a staircase, and the player
+	 * randomly, then masks all spaces of the board except the user.
 	 */
 	private void generalFloor()
 	{
@@ -177,9 +191,9 @@ public class Overworld extends World<Actor>
 		generateMaze();
 		new Staircase().putSelfInGrid(getGrid(), getRandomEmptyLocation());
 		
-		int enemyNumber = 5;
-		for(int x = 0; x < enemyNumber; x++)
-			new Enemy(EnemyType.getRandomEnemyType(), 5).putSelfInGrid(getGrid(), getRandomEmptyLocation());
+		for(int x = 0; x < NUM_ENEMIES; x++)
+			new Enemy(EnemyType.getRandomEnemyType())
+				.putSelfInGrid(getGrid(), getRandomEmptyLocation());
 		
 		Location playerLoc = getRandomEmptyLocation();
 		lootSpots = pickLootSpots();
@@ -188,25 +202,33 @@ public class Overworld extends World<Actor>
 		player = new Player();
 		player.putSelfInGrid(getGrid(), playerLoc);
 		unmask(player.getLocation());
+		
 		show();
-		getWorldFrame().setTitle("Randomness of Fungus - Floor " + floorNumber + " (" + lootGained + ")");
+		String floorInfo = floorNumber + " (Loot: " + lootGained + ")";
+		getWorldFrame().setTitle("Randomness of Fungus - Floor " + floorInfo);
 	}
 	
+	/**
+	 * Sets the window title to the game title and "Boss Floor,"
+	 * and places rocks, RNGesus, a staircase, and the player appropriately.
+	 */
 	private void bossFloor()
 	{
 		setGrid(new BoundedGrid<Actor>(SIDE_LENGTH, SIDE_LENGTH));
-		int r = SIDE_LENGTH / 2;
-		new Staircase().putSelfInGrid(getGrid(), new Location(r, SIDE_LENGTH - 1));
-		
-		for (int c = 0; c < SIDE_LENGTH; c++) 
+		for (int col = 0; col < SIDE_LENGTH; col++) 
 		{
-			new Rock().putSelfInGrid(getGrid(), new Location(r - 1, c));
-			new Rock().putSelfInGrid(getGrid(), new Location(r + 1, c));
+			new Rock().putSelfInGrid(getGrid(), new Location(MID_ROW - 1, col));
+			new Rock().putSelfInGrid(getGrid(), new Location(MID_ROW + 1, col));
 		}
 		
-		new RNGesus(this, floorNumber).putSelfInGrid(getGrid(), new Location(r, SIDE_LENGTH-2));
+		new Staircase().putSelfInGrid(getGrid(), 
+			new Location(MID_ROW, SIDE_LENGTH - 1));
+		
+		new RNGesus(this).putSelfInGrid(getGrid(), 
+			new Location(MID_ROW, SIDE_LENGTH - 2));
+		
 		player = new Player();
-		player.putSelfInGrid(getGrid(), new Location(r, 0));
+		player.putSelfInGrid(getGrid(), new Location(MID_ROW, 0));
 
 		show();
 		getWorldFrame().setTitle("Randomness of Fungus - Boss Floor");
@@ -218,33 +240,40 @@ public class Overworld extends World<Actor>
 	 */
 	private void mask()
 	{
-		for(int r = 0; r < getGrid().getNumRows(); r++)
-			for(int c = 0; c < getGrid().getNumCols(); c++)
+		for(int row = 0; row < SIDE_LENGTH; row++)
+		{
+			for(int col = 0; col < SIDE_LENGTH; col++)
 			{
-				Location loc = new Location(r, c);
+				Location loc = new Location(row, col);
 				Actor value = getGrid().get(loc);
 				if(value != null)
 					value.removeSelfFromGrid();
 				new Mystery(value).putSelfInGrid(getGrid(), loc);
 			}
+		}
 	}
 	
-	private void doBattle(Enemy enemy, int turns)
+	/**
+	 * Instantiate a battle with an appropriate number of moves against
+	 * a given enemy and change the GUI content pane to be that battle.
+	 * @param enemy - An enemy to fight against
+	 */
+	private void doBattle(Enemy enemy)
 	{
 		overworldPane = getContentPane();
 		isBattling = true;
 		
 		int numTurns;
 		if(floorNumber == 0)
-			numTurns = 5;
-		else if(floorNumber % 10 == 0)
+			numTurns = TUTORIAL_BATTLE_LENGTH;
+		else if(floorNumber % BOSS_FLOOR_MOD == 0)
 			numTurns = floorNumber;
 		else
 			numTurns = (int) Math.round(Math.log(floorNumber)) + 1;
 		
 		double alphaCurse = 0;
 		if(isCursed)
-			alphaCurse = 0.5 + 0.5 * Math.sin(floorNumber * Math.PI);
+			alphaCurse = MID_ALPHA + AMPLITUDE * Math.sin(floorNumber * Math.PI);
 		
 		Battle battle = new Battle(this, enemy, numTurns, alphaCurse);
 		setContentPane(battle);
@@ -253,9 +282,30 @@ public class Overworld extends World<Actor>
 		repaint();
 	}
 	
-	private void determineLoot()
+	/**
+	 * Returns a set of 5 random free spaces to become loot spots
+	 * @return a set of 5 random free spaces
+	 */
+	private Set<Location> pickLootSpots()
 	{
-		if(Math.random() < .2)
+		Set<Location> ret = new HashSet<Location>();
+		if(getGrid() != null)
+			for(int x = 0; x < NUM_LOOT; x++)
+				ret.add(getRandomEmptyLocation());
+		return ret;
+	}
+	
+	/**
+	 * There is a 1/5 chance that this method will curse the player.
+	 * If the player is already cursed, the player will cease to be cursed.
+	 * Otherwise, the player will gain a loot point.
+	 * Removes the given loot spot from the set of loot spots.
+	 * @param the loot spot to remove. 
+	 */
+	private void determineLoot(Location loc)
+	{
+		lootSpots.remove(loc);
+		if(Math.random() < CURSE_PROBABILITY && !isCursed)
 		{
 			isCursed = true;
 			setCursed(true);
@@ -268,7 +318,8 @@ public class Overworld extends World<Actor>
 		else
 		{
 			lootGained++;
-			getWorldFrame().setTitle("Randomness of Fungus - Floor " + floorNumber + " (" + lootGained + ")");
+			String floorInfo = floorNumber + " (Loot: " + lootGained + ")";
+			getWorldFrame().setTitle("Randomness of Fungus - Floor " + floorInfo);
 		}
 	}
 	
@@ -339,15 +390,6 @@ public class Overworld extends World<Actor>
 					if(getGrid().isValid(pot))
 						ret.add(pot);
 				}
-		return ret;
-	}
-
-	private Set<Location> pickLootSpots()
-	{
-		Set<Location> ret = new HashSet<Location>();
-		if(getGrid() != null)
-			for(int x = 0; x < 5; x++)
-				ret.add(getRandomEmptyLocation());
 		return ret;
 	}
 }

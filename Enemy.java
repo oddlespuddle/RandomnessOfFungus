@@ -2,7 +2,7 @@
  * Enemy class is an Actor representing a potential battle.
  * @author Alexander Wong and Jiaming Chen
  * Period: 2
- * Date: 2016-05-01 (ISO)
+ * Date: 2016-05-14 (ISO)
  */
 
 import info.gridworld.actor.Actor;
@@ -13,15 +13,22 @@ public class Enemy extends Actor{
 	private EnemyType type;
 	private int turns;
 	
-	public Enemy(EnemyType type, int turns)
+	/**
+	 * Stores the type of this enemy and makes it appear white.
+	 * @param type - This enemy's type.
+	 */
+	public Enemy(EnemyType type)
 	{
 		super();
 		this.type = type;
-		this.turns = turns;
 		setColor(ENEMY_COLOR);
 	}
 	
-	public EnemyType getType() {
+	/**
+	 * Returns this enemy's type.
+	 */
+	public EnemyType getType() 
+	{
 		return type;
 	}
 	

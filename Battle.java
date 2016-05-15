@@ -4,7 +4,7 @@
  * the game when necessary. 
  * @author Alexander Wong and Jiaming Chen
  * Period: 2
- * Date: 2016-04-30 (ISO)
+ * Date: 2016-05-14 (ISO)
  */
 
 import java.awt.event.KeyEvent;
@@ -31,31 +31,33 @@ import javax.swing.JTextField;
 public class Battle extends JPanel
 {
 	public static final int NUM_OPTIONS = 4;
-	public static final String[] moveOptions;
-	public static final String WORD_BANK = "WordBank.txt";
-	private static final List<Integer> userInputs = new LinkedList<>();
+	public static final double DEFAULT_ALPHA = 0.5;
+	public static final Color BOX_COLOR = Color.GRAY;
+	public static final List<Character> VALID_MOVES = 
+		new ArrayList<>(Arrays.asList('1', '2', '3', '4'));
+	private static String WORD_BANK = "WordBank.txt";
+	private static List<Integer> userInputs = new LinkedList<>();
+	private static String[] moveOptions
+		= new String[] {"Bait", "Rock", "Ball", "Panic"};
+	
 	private final Clip clip;
 	private JTextField responseText;
+	private Enemy enemy;
 	private Overworld floor;
 	private int turnsLeft;
 	private double prevPValue;
 	private double alpha;
-	private Enemy enemy;
 
 	static
 	{
-		String[] moveArray = new String[] {"Bait", "Rock", "Ball", "Panic"};
 		try
 		{
-			moveArray = new Scanner(new File(WORD_BANK)).useDelimiter("\\Z").next().split("\n");
+			moveOptions = new Scanner(new File(WORD_BANK))
+				.useDelimiter("\\Z").next().split("\n");
 		}
 		catch(IOException e)
 		{
 			System.err.println("Missing file: " + WORD_BANK);
-		}
-		finally
-		{
-			moveOptions = moveArray;
 		}
 	}
 
@@ -64,14 +66,14 @@ public class Battle extends JPanel
 	 * this battle, adds scenery and music, and responds to user input.
 	 * @param floor - the floor to which the GUI must return.
 	 */
-	public Battle(Overworld floor, Enemy enemy, int turns, double alphaBoost)
+	public Battle(Overworld floor, Enemy enemy, int turns, double alphaCurse)
 	{
 		setFocusable(true);
 		this.floor = floor;
 		this.enemy = enemy;
-		this.responseText = centeredTextBox(enemy.getType().getText(), Color.GRAY);
+		this.responseText = centeredTextBox(enemy.getType().getText());
 		this.prevPValue = 0;
-		this.alpha = 0.5 + alphaBoost;
+		this.alpha = DEFAULT_ALPHA + alphaCurse;
 		turnsLeft = turns;
 		clip = enemy.getType().getMusic();
 		addComponents();
@@ -89,8 +91,8 @@ public class Battle extends JPanel
 		c.gridy = 0;
 		c.gridheight = 1;
 		c.gridwidth = 1;
-		c.weightx = 1.0;
-		c.weighty = 1.0;
+		c.weightx = 1;
+		c.weighty = 1;
 		c.fill = GridBagConstraints.BOTH;
 		
 		this.add(responseText, c);
@@ -99,19 +101,24 @@ public class Battle extends JPanel
 		this.add(enemy.getType().getSprite(), c);
 		c.gridy++;
 
-		this.add(centeredTextBox("Options:", Color.GRAY), c);
+		this.add(centeredTextBox("Options:"), c);
 		c.gridy++;
 		
 		JPanel options = new JPanel(new GridLayout(2, 2));
 		for(int gridx = 1; gridx <= 4; gridx++)
-			options.add(centeredTextBox(String.format("%d: %s", gridx, getRandomMove()), Color.GRAY));
+			options.add(centeredTextBox(
+				String.format("%d: %s", gridx, getRandomMove())));
 		
 		this.add(options, c);
 	}
 	
+	/**
+	 * Returns a random move from the word bank.
+	 * @return a random move from the word bank.
+	 */
 	private String getRandomMove()
 	{
-		return moveOptions[(int) (Math.random()*moveOptions.length)];
+		return moveOptions[(int) (Math.random() * moveOptions.length)];
 	}
 	
 	/**
@@ -128,9 +135,9 @@ public class Battle extends JPanel
 			public void keyReleased(KeyEvent e)
 			{
 				char c = e.getKeyChar();
-				if(c >= '1' && c <= '4')
+				if(VALID_MOVES.contains(c))
 				{
-					takeTurn(c - '1');
+					takeTurn((int) c - VALID_MOVES.get(0));
 				}
 			}
 			
@@ -140,7 +147,7 @@ public class Battle extends JPanel
 	}
 	
 	/**
-	 * Processes a turn by the player
+	 * Processes a turn by the player, ending the battle when necessary.
 	 * @param input the option selected by the player
 	 */
 	private void takeTurn(int input)
@@ -170,20 +177,17 @@ public class Battle extends JPanel
 	}
 	
 	/**
-	 * Returns a JTextField with a centered, non-editable, non-focusable 
-	 * given text with a given color background.
+	 * Returns a non-editable, non-focusable JTextField with a given text.
 	 * @param message - the text to be displayed in this JTextField
-	 * @param background - the background color for this JTextField
-	 * @return a JTextField with a centered, non-editable, non-focusable 
-	 *         given text with a given color background.
+	 * @return a non-editable, non-focusable JTextField with a given text.
 	 */
-	private static JTextField centeredTextBox(String message, Color background)
+	private static JTextField centeredTextBox(String message)
 	{
 		JTextField ret = new JTextField(message);
 		ret.setHorizontalAlignment(JTextField.CENTER);
 		ret.setEditable(false);
 		ret.setFocusable(false);
-		ret.setBackground(background);
+		ret.setBackground(BOX_COLOR);
 		return ret;
 	}
 	
