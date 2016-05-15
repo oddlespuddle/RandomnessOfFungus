@@ -3,7 +3,7 @@
  * of the GameViewer.
  * @author Alexander Wong and Jiaming Chen
  * Period: 2
- * Date: 2016-04-30 (ISO)
+ * Date: 2016-05-14 (ISO)
  */
 
 import info.gridworld.actor.Actor;
@@ -23,9 +23,9 @@ public class RNGesus extends Enemy{
 	 * to time that color changing effect.
 	 * @param floor - the floor containing this RNGesus
 	 */
-	public RNGesus(final Overworld floor, int turns)
+	public RNGesus(final Overworld floor)
 	{
-		super(EnemyType.RNGESUS, turns);
+		super(EnemyType.RNGESUS);
 		this.floor = floor;
 		colorTimer = new Timer(DELAY, new ActionListener() 
 		{
