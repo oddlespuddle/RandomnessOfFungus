@@ -1,11 +1,3 @@
-/** 
- * EnemyType enum stores the messages, images, and clips associated
- * with a variety of mem-based enemies to be used in battle.
- * @author Alexander Wong and Jiaming Chen
- * Period: 2
- * Date: 2016-05-14 (ISO)
- */
-
 import java.awt.Image;
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,23 +39,12 @@ public enum EnemyType {
 			themeClip("EnemyMusic/NyanCat.wav"));
 	
 	public static final EnemyType[] types = {TROLL, RICK_ASTLEY, NYAN_CAT, MUDKIPZ};
-	public static final int IMAGE_WIDTH = 500;
-	public static final int IMAGE_HEIGHT = 400;
 	private final String text;
 	private final String negative;
 	private final String positive;
 	private final JLabel sprite;
 	private final Clip music;
 	
-	/**
-	 * Instantiates an EnemyType with a given intro text, negative text,
-	 * positive text, sprite, and music clip.
-	 * @param text - intro text
-	 * @param negative - negative text
-	 * @param positive - positive text
-	 * @param sprite - the enemy's image in a battle
-	 * @param music - the enemy's background music in battle
-	 */
 	EnemyType(String text, String negative, String positive, JLabel sprite, Clip music)
 	{
 		this.text = text;
@@ -73,54 +54,30 @@ public enum EnemyType {
 		this.music = music;
 	}
 	
-	/**
-	 * Returns a random enemy type that is not RNGesus
-	 * @return a random enemy type that is not RNGesus
-	 */
 	public static EnemyType getRandomEnemyType(){
 		return types[(int) (Math.random()*types.length)];
 	}
 	
-	/**
-	 * Returns this EnemyType's intro text
-	 * @return this EnemyType's intro text
-	 */
 	public String getText()
 	{
 		return text;
 	}
 
-	/**
-	 * Returns this EnemyType's negative text
-	 * @return this EnemyType's negative text
-	 */
 	public String getNegative()
 	{
 		return negative;
 	}
 
-	/**
-	 * Returns this EnemyType's positive text
-	 * @return this EnemyType's positive text
-	 */
 	public String getPositive()
 	{
 		return positive;
 	}
-
-	/**
-	 * Returns this EnemyType's sprite
-	 * @return this EnemyType's sprite
-	 */
+	
 	public JLabel getSprite() 
 	{
 		return sprite;
 	}
-
-	/**
-	 * Returns this EnemyType's background music
-	 * @return this EnemyType's background music
-	 */
+	
 	public Clip getMusic()
 	{
 		return music;
@@ -128,7 +85,7 @@ public enum EnemyType {
 	
 	/**
 	 * Returns a JLabel containing the image contained in the file
-	 * with the given file name scaled to 500x400.
+	 * with the given file name.
 	 * @param fileName - the name of the image file to be encapsulated.
 	 * @return a JLabel containing the given image.
 	 */
@@ -136,10 +93,8 @@ public enum EnemyType {
 	{
 		try
 		{
-			ImageIcon imgIcon = new ImageIcon(ImageIO.read(
-				new FileInputStream(fileName)));
-			imgIcon = new ImageIcon(imgIcon.getImage().getScaledInstance(
-				IMAGE_WIDTH, IMAGE_HEIGHT, Image.SCALE_AREA_AVERAGING));
+			ImageIcon imgIcon = new ImageIcon(ImageIO.read(new FileInputStream(fileName)));
+			imgIcon = new ImageIcon(imgIcon.getImage().getScaledInstance(500, 400, Image.SCALE_AREA_AVERAGING));
 			return new JLabel(imgIcon);
 		}
 		catch(IOException ioe)

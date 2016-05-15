@@ -1,9 +1,6 @@
 /** 
  * Mystery class hides the values of other Actors by storing them
  * and taking their place in the grid until they are revealed.
- * @author Alexander Wong and Jiaming Chen
- * Period: 2
- * Date: 2016-05-14 (ISO)
  */
 
 import info.gridworld.actor.Actor;

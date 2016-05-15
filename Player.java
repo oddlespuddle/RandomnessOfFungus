@@ -3,14 +3,13 @@
  * within the current floor of the GameViewer.
  * @author Alexander Wong and Jiaming Chen
  * Period: 2
- * Date: 2016-05-14 (ISO)
+ * Date: 2016-04-30 (ISO)
  */
 
 import info.gridworld.actor.Actor;
 import java.awt.Color;
 
 public class Player extends Actor{
-	//This is the average color of the doge image
 	public static final Color PLAYER_COLOR = new Color(203, 152, 0);
 
 	/**

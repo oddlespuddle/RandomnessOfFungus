@@ -3,7 +3,7 @@
  * GameViewer.
  * @author Alexander Wong and Jiaming Chen
  * Period: 2
- * Date: 2016-05-14 (ISO)
+ * Date: 2016-04-30 (ISO)
  */
 
 import info.gridworld.actor.Actor;

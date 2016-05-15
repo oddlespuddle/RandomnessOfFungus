@@ -4,7 +4,7 @@
  * the game when necessary. 
  * @author Alexander Wong and Jiaming Chen
  * Period: 2
- * Date: 2016-05-14 (ISO)
+ * Date: 2016-04-30 (ISO)
  */
 
 import java.awt.event.KeyEvent;
@@ -16,7 +16,6 @@ import java.awt.GridLayout;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,49 +31,53 @@ import javax.swing.JTextField;
 public class Battle extends JPanel
 {
 	public static final int NUM_OPTIONS = 4;
-	public static final double DEFAULT_ALPHA = 0.5;
-	public static final Color BOX_COLOR = Color.GRAY;
-	public static final List<Character> VALID_MOVES = 
-		new ArrayList<>(Arrays.asList('1', '2', '3', '4'));
-	private static String WORD_BANK = "WordBank.txt";
-	private static List<Integer> userInputs = new LinkedList<>();
-	private static String[] moveOptions
-		= new String[] {"Bait", "Rock", "Ball", "Panic"};
-	
+	public static final String[] moveOptions;
+	public static final String WORD_BANK = "WordBank.txt";
+	public static final double ALPHA = .05;
+	public static final double CURSED_ALPHA = .1;
+	private static final List<Integer> userInputs = new LinkedList<>();
 	private final Clip clip;
 	private JTextField responseText;
-	private Enemy enemy;
 	private Overworld floor;
 	private int turnsLeft;
 	private double prevPValue;
-	private double alpha;
+	private Enemy enemy;
+	private boolean isCursed;
 
 	static
 	{
+		String[] moveArray = new String[] {"Bait", "Rock", "Ball", "Panic"};
 		try
 		{
-			moveOptions = new Scanner(new File(WORD_BANK))
-				.useDelimiter("\\Z").next().split("\n");
+			moveArray = new Scanner(new File(WORD_BANK)).useDelimiter("\\Z").next().split("\n");
 		}
 		catch(IOException e)
 		{
 			System.err.println("Missing file: " + WORD_BANK);
+		}
+		finally
+		{
+			moveOptions = moveArray;
 		}
 	}
 
 	/**
 	 * Stores a reference to the floor whose GUI must be returned to after
 	 * this battle, adds scenery and music, and responds to user input.
-	 * @param floor - the floor to which the GUI must return.
+	 * @param floor the floor to which the GUI must return.
+	 * @param enemy the enemy that initiated the battle
+	 * @param turns the number of turns the battle is to last
+	 * @param isCursed true the player is cursed when the battle initiated,
+	 * 		false if not
 	 */
-	public Battle(Overworld floor, Enemy enemy, int turns, double alphaCurse)
+	public Battle(Overworld floor, Enemy enemy, int turns, boolean isCursed)
 	{
 		setFocusable(true);
 		this.floor = floor;
 		this.enemy = enemy;
-		this.responseText = centeredTextBox(enemy.getType().getText());
+		this.responseText = centeredTextBox(enemy.getType().getText(), Color.GRAY);
 		this.prevPValue = 0;
-		this.alpha = DEFAULT_ALPHA + alphaCurse;
+		this.isCursed = isCursed;
 		turnsLeft = turns;
 		clip = enemy.getType().getMusic();
 		addComponents();
@@ -92,8 +95,8 @@ public class Battle extends JPanel
 		c.gridy = 0;
 		c.gridheight = 1;
 		c.gridwidth = 1;
-		c.weightx = 1;
-		c.weighty = 1;
+		c.weightx = 1.0;
+		c.weighty = 1.0;
 		c.fill = GridBagConstraints.BOTH;
 		
 		this.add(responseText, c);
@@ -102,24 +105,19 @@ public class Battle extends JPanel
 		this.add(enemy.getType().getSprite(), c);
 		c.gridy++;
 
-		this.add(centeredTextBox("Options:"), c);
+		this.add(centeredTextBox("Options:", Color.GRAY), c);
 		c.gridy++;
 		
 		JPanel options = new JPanel(new GridLayout(2, 2));
 		for(int gridx = 1; gridx <= 4; gridx++)
-			options.add(centeredTextBox(
-				String.format("%d: %s", gridx, getRandomMove())));
+			options.add(centeredTextBox(String.format("%d: %s", gridx, getRandomMove()), Color.GRAY));
 		
 		this.add(options, c);
 	}
 	
-	/**
-	 * Returns a random move from the word bank.
-	 * @return a random move from the word bank.
-	 */
 	private String getRandomMove()
 	{
-		return moveOptions[(int) (Math.random() * moveOptions.length)];
+		return moveOptions[(int) (Math.random()*moveOptions.length)];
 	}
 	
 	/**
@@ -136,9 +134,9 @@ public class Battle extends JPanel
 			public void keyReleased(KeyEvent e)
 			{
 				char c = e.getKeyChar();
-				if(VALID_MOVES.contains(c))
+				if(c >= '1' && c <= '4')
 				{
-					takeTurn((int) c - VALID_MOVES.get(0));
+					takeTurn(c - '1');
 				}
 			}
 			
@@ -148,14 +146,14 @@ public class Battle extends JPanel
 	}
 	
 	/**
-	 * Processes a turn by the player, ending the battle when necessary.
+	 * Processes a turn by the player
 	 * @param input the option selected by the player
 	 */
 	private void takeTurn(int input)
 	{
 		userInputs.add(input);
 		double newPValue = testForRandomness();
-		if(newPValue >= prevPValue)
+		if(newPValue <= prevPValue)
 			responseText.setText(enemy.getType().getPositive());
 		else
 			responseText.setText(enemy.getType().getNegative());
@@ -178,28 +176,32 @@ public class Battle extends JPanel
 	}
 	
 	/**
-	 * Returns a non-editable, non-focusable JTextField with a given text.
+	 * Returns a JTextField with a centered, non-editable, non-focusable 
+	 * given text with a given color background.
 	 * @param message - the text to be displayed in this JTextField
-	 * @return a non-editable, non-focusable JTextField with a given text.
+	 * @param background - the background color for this JTextField
+	 * @return a JTextField with a centered, non-editable, non-focusable 
+	 *         given text with a given color background.
 	 */
-	private static JTextField centeredTextBox(String message)
+	private static JTextField centeredTextBox(String message, Color background)
 	{
 		JTextField ret = new JTextField(message);
 		ret.setHorizontalAlignment(JTextField.CENTER);
 		ret.setEditable(false);
 		ret.setFocusable(false);
-		ret.setBackground(BOX_COLOR);
+		ret.setBackground(background);
 		return ret;
 	}
 	
 	/**
 	 * Tests the randomness of the input history of the player and causes the 
 	 * player to lose if the results do not meet the randomness threshold.
+	 * @return the smallest p value of all tests done
 	 */
 	private double testForRandomness()
 	{
 		int maxGroupSize = (int) (Math.log(userInputs.size() / 5.0) / Math.log(NUM_OPTIONS));
-		double maxPValue = 0;
+		double minPValue = 0;
 		for (int groupSize = 1; groupSize <= maxGroupSize; groupSize++) 
 		{
 			int numGroups = (int) Math.pow(NUM_OPTIONS, groupSize);
@@ -215,13 +217,13 @@ public class Battle extends JPanel
 					frequencies[n]++;
 				}
 				double pValue = chiSquaredUniformityTest(frequencies);
-				if (pValue > maxPValue)
-					maxPValue = pValue;
-				if (pValue <= alpha)
+				if (pValue < minPValue)
+					minPValue = pValue;
+				if (isCursed && pValue <= CURSED_ALPHA || pValue <= ALPHA)
 					floor.loseTheGame();
 			}
 		}
-		return maxPValue;
+		return minPValue;
 	}
 
 	/**
