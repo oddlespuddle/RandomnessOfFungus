@@ -111,11 +111,8 @@ public class Overworld extends World<Actor>
 	public void loseTheGame(int[] frequencies)
 	{
 		System.out.println("You just lost the game!");
-		HistogramComponent histogram = new HistogramComponent(frequencies);
-		JScrollPane scrollPane = new JScrollPane(histogram);
-		setContentPane(scrollPane);
-		validate();
-		repaint();
+		overworldPane = new HistogramComponent(frequencies);
+		overworldReturn();
 	}
 	
 	/**
@@ -400,6 +397,6 @@ class HistogramComponent extends JComponent {
 			String label = String.format("%8s", new String(moves));
 			g.drawString(label, 0, y);
 		}
-		setPreferredSize(new Dimension(width, y));
+		//~ setPreferredSize(new Dimension(width, y));
 	}
 }
