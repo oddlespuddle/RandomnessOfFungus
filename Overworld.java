@@ -110,11 +110,11 @@ public class Overworld extends World<Actor>
 	
 	public void loseTheGame(int[] frequencies)
 	{
-		System.out.println("You just lost the game!");
-		overworldPane = new HistogramComponent(frequencies);
+		getWorldFrame().setTitle("You just lost the game!");
+		HistogramComponent histogram = new HistogramComponent(frequencies);
 		isBattling = true;
-		setContentPane(overworldPane);
-		getWorldFrame().requestFocusInWindow();
+		setContentPane(histogram);
+		histogram.requestFocusInWindow();
 		validate();
 		repaint();
 	}
@@ -175,7 +175,6 @@ public class Overworld extends World<Actor>
 		unmask(player.getLocation());
 		show();
 		getWorldFrame().setTitle("Randomness of Fungus - Tutorial Floor");
-		//~ setCursed(true);
 	}
 	
 	/**

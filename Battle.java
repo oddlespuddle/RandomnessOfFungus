@@ -44,6 +44,7 @@ public class Battle extends JPanel
 	private double prevPValue;
 	private Enemy enemy;
 	private boolean isCursed;
+	private boolean isBattling;
 
 	static
 	{
@@ -79,6 +80,7 @@ public class Battle extends JPanel
 		this.responseText = centeredTextBox(enemy.getType().getText(), Color.GRAY);
 		this.prevPValue = 0;
 		this.isCursed = isCursed;
+		this.isBattling = true;
 		turnsLeft = turns;
 		clip = enemy.getType().getMusic();
 		addComponents();
@@ -135,7 +137,7 @@ public class Battle extends JPanel
 			public void keyReleased(KeyEvent e)
 			{
 				char c = e.getKeyChar();
-				if(c >= '1' && c <= '1' + NUM_OPTIONS)
+				if(isBattling && c >= '1' && c <= '1' + NUM_OPTIONS)
 				{
 					takeTurn(c - '1');
 				}
@@ -154,10 +156,12 @@ public class Battle extends JPanel
 	{
 		userInputs.add(input);
 		double newPValue = testForRandomness();
+
 		if(newPValue <= prevPValue)
 			responseText.setText(enemy.getType().getPositive());
 		else
 			responseText.setText(enemy.getType().getNegative());
+		
 		prevPValue = newPValue;
 		repaint();
 		if (--turnsLeft == 0)
@@ -172,8 +176,19 @@ public class Battle extends JPanel
 		if(clip != null)
 			clip.stop();
 
-		if(floor != null)
+		if(isBattling && floor != null)
 			floor.overworldReturn();
+	}
+	
+	private void loseTheGame(int[] frequencies)
+	{
+		isBattling = false;
+		
+		if(clip != null)
+			clip.stop();
+
+		if(floor != null)
+			floor.loseTheGame(frequencies);
 	}
 	
 	/**
@@ -221,7 +236,7 @@ public class Battle extends JPanel
 				if (pValue < minPValue)
 					minPValue = pValue;
 				if (isCursed && pValue <= CURSED_ALPHA || pValue <= ALPHA)
-					floor.loseTheGame(frequencies);
+					loseTheGame(frequencies);
 			}
 		}
 		return minPValue;
