@@ -112,7 +112,11 @@ public class Overworld extends World<Actor>
 	{
 		System.out.println("You just lost the game!");
 		overworldPane = new HistogramComponent(frequencies);
-		overworldReturn();
+		isBattling = true;
+		setContentPane(overworldPane);
+		getWorldFrame().requestFocusInWindow();
+		validate();
+		repaint();
 	}
 	
 	/**
