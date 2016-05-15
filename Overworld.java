@@ -15,12 +15,19 @@ import info.gridworld.grid.Location;
 import info.gridworld.world.World;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.swing.JComponent;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 
 public class Overworld extends World<Actor>
 {
@@ -101,10 +108,14 @@ public class Overworld extends World<Actor>
 		repaint();
 	}
 	
-	public void loseTheGame()
+	public void loseTheGame(int[] frequencies)
 	{
 		System.out.println("You just lost the game!");
-		System.exit(0);
+		HistogramComponent histogram = new HistogramComponent(frequencies);
+		JScrollPane scrollPane = new JScrollPane(histogram);
+		setContentPane(scrollPane);
+		validate();
+		repaint();
 	}
 	
 	/**
@@ -242,10 +253,6 @@ public class Overworld extends World<Actor>
 		else
 			numTurns = (int) Math.round(Math.log(floorNumber)) + 1;
 		
-		double alphaCurse = 0;
-		if(isCursed)
-			alphaCurse = 0.5 + 0.5 * Math.sin(floorNumber * Math.PI);
-		
 		Battle battle = new Battle(this, enemy, numTurns, isCursed);
 		setContentPane(battle);
 		battle.requestFocusInWindow();
@@ -349,5 +356,50 @@ public class Overworld extends World<Actor>
 			for(int x = 0; x < 5; x++)
 				ret.add(getRandomEmptyLocation());
 		return ret;
+	}
+}
+
+class HistogramComponent extends JComponent {
+	public static final int TEXT_FONT_SIZE = 25;
+	public static final int LABEL_FONT_SIZE = 20;
+	public static final int LABEL_WIDTH = 100;
+	public static final int BREAK_HEIGHT = 20;
+	int[] frequencies;
+	int max = 0;
+	int groupSize;
+	HistogramComponent(int[] frequencies) {
+		this.frequencies = frequencies.clone();
+		for (int n : this.frequencies) {
+			if (n > max)
+				max = n;
+		}
+		groupSize = (int) (Math.log(frequencies.length)/Math.log(Battle.NUM_OPTIONS));
+	}
+
+	public void paintComponent(Graphics g) {
+		int y = 0;
+		int width = getWidth() - JScrollBar.WIDTH;
+		g.setFont(new Font("Comic Sans MS", Font.PLAIN, TEXT_FONT_SIZE));
+		y += TEXT_FONT_SIZE;
+		g.drawString("You have lost the game!", 0, y);
+		y += TEXT_FONT_SIZE;
+		g.drawString("Here's how you failed to be random:", 0, y);
+		g.setFont(new Font("Courier", Font.PLAIN, LABEL_FONT_SIZE));
+		y += BREAK_HEIGHT + LABEL_FONT_SIZE;
+		g.drawString("Move Set", 0, y);
+		g.drawString("Frequency", (width - LABEL_WIDTH) / 2 + LABEL_WIDTH, y);
+		for (int i = 0; i < frequencies.length; i++) {
+			g.fillRect(LABEL_WIDTH, y, (width - LABEL_WIDTH)*frequencies[i]/max, LABEL_FONT_SIZE);
+			y += LABEL_FONT_SIZE;
+			char[] moves = new char[groupSize];
+			int n = i;
+			for (int j = groupSize - 1; j >= 0; j--) {
+				moves[j] = (char) (n % Battle.NUM_OPTIONS + '1');
+				n /= Battle.NUM_OPTIONS;
+			}
+			String label = String.format("%8s", new String(moves));
+			g.drawString(label, 0, y);
+		}
+		setPreferredSize(new Dimension(width, y));
 	}
 }

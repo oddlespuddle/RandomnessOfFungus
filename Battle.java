@@ -31,6 +31,7 @@ import javax.swing.JTextField;
 public class Battle extends JPanel
 {
 	public static final int NUM_OPTIONS = 4;
+	public static final int NUM_ROWS = 2;
 	public static final String[] moveOptions;
 	public static final String WORD_BANK = "WordBank.txt";
 	public static final double ALPHA = .05;
@@ -108,8 +109,8 @@ public class Battle extends JPanel
 		this.add(centeredTextBox("Options:", Color.GRAY), c);
 		c.gridy++;
 		
-		JPanel options = new JPanel(new GridLayout(2, 2));
-		for(int gridx = 1; gridx <= 4; gridx++)
+		JPanel options = new JPanel(new GridLayout(NUM_ROWS, (NUM_OPTIONS + 1) / NUM_ROWS));
+		for(int gridx = 1; gridx <= NUM_OPTIONS; gridx++)
 			options.add(centeredTextBox(String.format("%d: %s", gridx, getRandomMove()), Color.GRAY));
 		
 		this.add(options, c);
@@ -134,7 +135,7 @@ public class Battle extends JPanel
 			public void keyReleased(KeyEvent e)
 			{
 				char c = e.getKeyChar();
-				if(c >= '1' && c <= '4')
+				if(c >= '1' && c <= '1' + NUM_OPTIONS)
 				{
 					takeTurn(c - '1');
 				}
@@ -213,14 +214,14 @@ public class Battle extends JPanel
 				{
 					int n = 0;
 					for (int j = 0; j < groupSize; j++) 
-						n  = n*4 + it.next();
+						n  = n * NUM_OPTIONS + it.next();
 					frequencies[n]++;
 				}
 				double pValue = chiSquaredUniformityTest(frequencies);
 				if (pValue < minPValue)
 					minPValue = pValue;
 				if (isCursed && pValue <= CURSED_ALPHA || pValue <= ALPHA)
-					floor.loseTheGame();
+					floor.loseTheGame(frequencies);
 			}
 		}
 		return minPValue;
