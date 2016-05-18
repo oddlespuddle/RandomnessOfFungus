@@ -10,7 +10,6 @@ import java.awt.Font;
 import java.awt.Graphics;
 import javax.swing.JComponent;
 import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
 
 public class HistogramComponent extends JComponent 
 {
@@ -39,7 +38,7 @@ public class HistogramComponent extends JComponent
 			if (n > max)
 				max = n;
 		groupSize = (int) (Math.log(frequencies.length) / Math.log(Battle.NUM_OPTIONS));
-		setPreferredSize(new Dimension(getWidth(), height));
+		setPreferredSize(new Dimension(width, height));
 	}
 
 	/**
@@ -51,7 +50,8 @@ public class HistogramComponent extends JComponent
 		int y = 0;
 		int width = getWidth() - JScrollBar.WIDTH - 2 * MARGIN_WIDTH;
 		g.setFont(new Font("Comic Sans MS", Font.PLAIN, TEXT_FONT_SIZE));
-		for (String s : TEXT) {
+		for (String s : TEXT) 
+		{
 			y += TEXT_FONT_SIZE;
 			g.drawString(s, MARGIN_WIDTH, y);
 		}
@@ -79,7 +79,8 @@ public class HistogramComponent extends JComponent
 			y += LABEL_FONT_SIZE;
 			char[] moves = new char[groupSize];
 			int n = i;
-			for (int j = groupSize - 1; j >= 0; j--) {
+			for (int j = groupSize - 1; j >= 0; j--) 
+			{
 				moves[j] = (char) (n % Battle.NUM_OPTIONS + '1');
 				n /= Battle.NUM_OPTIONS;
 			}

@@ -10,10 +10,8 @@
 import info.gridworld.actor.Actor;
 import info.gridworld.actor.Rock;
 import info.gridworld.grid.BoundedGrid;
-import info.gridworld.grid.Grid;
 import info.gridworld.grid.Location;
 import info.gridworld.world.World;
-import java.awt.Color;
 import java.awt.Container;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,8 +30,6 @@ public class Overworld extends World<Actor>
 	private static final int MID_ROW = SIDE_LENGTH / 2;
 	private static final int NUM_ENEMIES = 5;
 	private static final int NUM_LOOT = 5;
-	private static final double MID_ALPHA = 0.5;
-	private static final double AMPLITUDE = 0.5;
 	private static final double CURSE_PROBABILITY = 0.2;
 	private static final Map<String, Integer> KEY_DIRECTION;
 	
@@ -68,7 +64,7 @@ public class Overworld extends World<Actor>
 	{
 		System.setProperty("info.gridworld.gui.selection", "hide");
 		System.setProperty("info.gridworld.gui.tooltips", "hide");
-		Overworld floor = new Overworld();
+		new Overworld();
 	}
 
 	/**
@@ -278,11 +274,7 @@ public class Overworld extends World<Actor>
 		else
 			numTurns = (int) Math.round(Math.log(floorNumber)) + 1;
 		
-		double alphaCurse = 0;
-		if(isCursed)
-			alphaCurse = MID_ALPHA + AMPLITUDE * Math.sin(floorNumber * Math.PI);
-		
-		Battle battle = new Battle(this, enemy, numTurns, alphaCurse);
+		Battle battle = new Battle(this, enemy, numTurns, isCursed);
 		setContentPane(battle);
 		battle.requestFocusInWindow();
 		validate();

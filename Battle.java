@@ -21,18 +21,15 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
-import javax.imageio.ImageIO;
 import javax.sound.sampled.Clip;
-import javax.swing.ImageIcon;
 import javax.swing.JPanel;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 public class Battle extends JPanel
 {
 	public static final int NUM_OPTIONS = 4;
-	public static final double DEFAULT_ALPHA = 0.5;
+	public static final double ALPHA = .05;
+	public static final double CURSED_ALPHA = .1;
 	public static final Color BOX_COLOR = Color.GRAY;
 	public static final List<Character> VALID_MOVES = 
 		new ArrayList<>(Arrays.asList('1', '2', '3', '4'));
@@ -47,15 +44,15 @@ public class Battle extends JPanel
 	private Overworld floor;
 	private int turnsLeft;
 	private double prevPValue;
-	private double alpha;
 	private boolean isBattling;
+	private boolean isCursed;
 
 	static
 	{
 		try
 		{
-			moveOptions = new Scanner(new File(WORD_BANK))
-				.useDelimiter("\\Z").next().split("\n");
+			moveOptions = new Scanner(new File(WORD_BANK)).useDelimiter("\\Z")
+					.next().split("\n");
 		}
 		catch(IOException e)
 		{
@@ -68,16 +65,16 @@ public class Battle extends JPanel
 	 * this battle, adds scenery and music, and responds to user input.
 	 * @param floor - the floor to which the GUI must return.
 	 */
-	public Battle(Overworld floor, Enemy enemy, int turns, double alphaCurse)
+	public Battle(Overworld floor, Enemy enemy, int turns, boolean isCursed)
 	{
 		setFocusable(true);
 		this.floor = floor;
 		this.enemy = enemy;
 		this.responseText = centeredTextBox(enemy.getType().getText());
 		this.prevPValue = 0;
-		this.alpha = DEFAULT_ALPHA + alphaCurse;
 		this.isBattling = true;
 		turnsLeft = turns;
+		this.isCursed = isCursed;
 		clip = enemy.getType().getMusic();
 		addComponents();
 		takeInput();
@@ -216,7 +213,7 @@ public class Battle extends JPanel
 	private double testForRandomness()
 	{
 		int maxGroupSize = (int) (Math.log(userInputs.size() / 5.0) / Math.log(NUM_OPTIONS));
-		double maxPValue = 0;
+		double minPValue = 1;
 		for (int groupSize = 1; groupSize <= maxGroupSize; groupSize++) 
 		{
 			int numGroups = (int) Math.pow(NUM_OPTIONS, groupSize);
@@ -232,13 +229,13 @@ public class Battle extends JPanel
 					frequencies[n]++;
 				}
 				double pValue = chiSquaredUniformityTest(frequencies);
-				if (pValue > maxPValue)
-					maxPValue = pValue;
-				if (pValue <= alpha)
+				if (pValue < minPValue)
+					minPValue = pValue;
+				if (pValue <= ALPHA || isCursed && pValue <= CURSED_ALPHA)
 					loseTheGame(frequencies);
 			}
 		}
-		return maxPValue;
+		return minPValue;
 	}
 
 	/**

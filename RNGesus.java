@@ -6,7 +6,6 @@
  * Date: 2016-05-14 (ISO)
  */
 
-import info.gridworld.actor.Actor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.Color;
@@ -14,7 +13,6 @@ import javax.swing.Timer;
 
 public class RNGesus extends Enemy{
 	public static final int DELAY = 100;
-	private final Overworld floor;
 	private Timer colorTimer;
 	
 	/**
@@ -26,7 +24,6 @@ public class RNGesus extends Enemy{
 	public RNGesus(final Overworld floor)
 	{
 		super(EnemyType.RNGESUS);
-		this.floor = floor;
 		colorTimer = new Timer(DELAY, new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e)

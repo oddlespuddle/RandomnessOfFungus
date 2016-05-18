@@ -11,7 +11,6 @@ import java.awt.Color;
 public class Enemy extends Actor{
 	public static final Color ENEMY_COLOR = Color.WHITE;
 	private EnemyType type;
-	private int turns;
 	
 	/**
 	 * Stores the type of this enemy and makes it appear white.
