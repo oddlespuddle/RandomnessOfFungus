@@ -47,6 +47,7 @@ public class Battle extends JPanel
 	private boolean isBattling;
 	private boolean isCursed;
 
+	//If there is a custom word bank file, use it
 	static
 	{
 		try
@@ -56,7 +57,7 @@ public class Battle extends JPanel
 		}
 		catch(IOException e)
 		{
-			System.err.println("Missing file: " + WORD_BANK);
+			//No file given, so not needed.
 		}
 	}
 

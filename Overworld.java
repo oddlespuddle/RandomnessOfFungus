@@ -33,6 +33,7 @@ public class Overworld extends World<Actor>
 	private static final double CURSE_PROBABILITY = 0.2;
 	private static final Map<String, Integer> KEY_DIRECTION;
 	
+	//Populate the KEY_DIRECTION map with keyboard inputs and directions
 	static
 	{
 		KEY_DIRECTION = new HashMap<>();
